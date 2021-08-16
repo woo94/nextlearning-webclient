@@ -27,8 +27,6 @@ function Main() {
         }
         run()
     }, [])
-    
-    console.log('rerender?')
 
     return (
         <Container>

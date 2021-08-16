@@ -1,56 +1,54 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import {useAppSelector, useAppDispatch} from '../util/appState/hooks'
 import Button from '@material-ui/core/Button'
-import {logout, setSocketConnected, friendOnline, friendOffline, selectUser, setIsOnline} from '../util/appState/userSlice'
+import {logout, selectUser, friendOnline, setIsOnline} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
 import { useEffect } from 'react'
-import {createClientSocket} from '../util/Socket'
-import { io } from 'socket.io-client'
+import {useSocket} from '../util/customHook'
 
 function MyInfo() {
     const user = useAppSelector(selectUser)
     const dispatch = useAppDispatch()
-    const idToken = user.idToken
-    const [socket, setSocket] = useState(io({autoConnect: false}))
+    const {isSocketAvailable, socketRef} = useSocket()
 
     useEffect(() => {
-        setSocket()
-        // if(user.idToken.length !== 0) {
-        //     const socket = createClientSocket(idToken)
-        //     socket.on("connect", () => {
-        //         console.log(socket.id)
-        //         dispatch(setSocketConnected())
-        //         dispatch(setIsOnline())
+        if(!isSocketAvailable) {
+            return
+        }
+        const socket = socketRef.current
 
-        //         socket.emit("set-friend-list", user.friendList.map(friend => friend.uid))
+        dispatch(setIsOnline())
+        
+        socket.on("connect", () => {
+            console.log("socket connected / MyInfo")
+        })
+        
+        socket.on("connect_error", (err) => {
+            console.log(err)
+        })
 
-        //         socket.emit("get-friend-list")
-            
-        //         socket.on("friend-online-status", (friendList) => {
-        //             console.log(friendList)
-        //             friendList.forEach((friend: {uid: string, online: string}) => {
-        //                 if(friend.online === "true") {
-        //                     dispatch(friendOnline(friend.uid))
-        //                 }
-        //                 else {
-        //                     dispatch(friendOffline(friend.uid))
-        //                 }
-        //             })
-        //         })
+        socket.emit("__req__set-friend-list", user.friendList.map(friend => friend.uid))
 
-        //         socket.on("user.online", (uid) => {
-        //             console.log('user.online', uid)
-        //         })
-        //     })
+        socket.on("__req__get-friend-list", (friendList: Array<{uid: string, online: string}>) => {
+            friendList.forEach(friend => {
+                dispatch(friendOnline(friend.uid))
+            })
+        })
 
-        //     return () => {
-        //         socket.close()
-        //     }
-        // }
-    }, 
-    // [user.idToken]
-    []
-    )
+        socket.on("user.online", (uid) => {
+            console.log("user.online event", uid)
+        })
+
+        socket.on("user.offline", (uid) => {
+            console.log("user.offline event", uid)
+        })
+
+        socket.emit("ping")
+
+        socket.on("pong", () => {
+            console.log("pong")
+        })
+    }, [isSocketAvailable])
     
     return (
         <>

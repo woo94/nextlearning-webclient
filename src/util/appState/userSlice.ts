@@ -1,8 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import {RootState} from './Store'
 import firebase from '../../firebase'
-import { DefaultEventsMap } from 'socket.io-client/build/typed-events'
-import {io, Socket} from 'socket.io-client'
 
 interface UserState {
     idToken: string;
@@ -12,9 +10,6 @@ interface UserState {
     name: string;
     isOnline: boolean;
     friendsOnline: Array<string>;
-    friendsOnlinePulled: boolean;
-    socketConnected: boolean;
-    socket: Socket<DefaultEventsMap, DefaultEventsMap>
 }
 
 const initialState: UserState = {
@@ -24,12 +19,7 @@ const initialState: UserState = {
     isLogin: false,
     name: '',
     isOnline: false,
-    friendsOnline: [],
-    friendsOnlinePulled: false,
-    socketConnected: false,
-    socket: io({
-        autoConnect: false
-    })
+    friendsOnline: []
 }
 
 export const submitLoginInfo = createAsyncThunk(
@@ -83,9 +73,6 @@ export const userSlice = createSlice({
         setIsLogin: (state, action) => {
             state.isLogin = action.payload
         },
-        setSocketConnected: (state) => {
-            state.socketConnected = true
-        },
         setIsOnline: (state) => {
             state.isOnline = true
         },
@@ -126,7 +113,7 @@ export const userSlice = createSlice({
     }
 })
 
-export const {setUid, setIdToken, setFriendList, setIsLogin, setSocketConnected, setIsOnline, friendOnline, friendOffline} = userSlice.actions
+export const {setUid, setIdToken, setFriendList, setIsLogin, setIsOnline, friendOnline, friendOffline} = userSlice.actions
 
 export const selectUser = (state: RootState) => state.user
 

@@ -6,9 +6,11 @@ import {useAppSelector} from './util/appState/hooks'
 
 function App() {
     const user = useAppSelector(selectUser)
+    
     return (
         user.isLogin ? 
-        <Main /> :
+            <Main /> 
+        :
         <Login />
     )
 }
