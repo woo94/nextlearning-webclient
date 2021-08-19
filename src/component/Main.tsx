@@ -5,8 +5,11 @@ import {selectUser, getUserDoc, getIdToken} from '../util/appState/userSlice'
 import Container from '@material-ui/core/Container'
 import Typography from '@material-ui/core/Typography'
 import {makeStyles} from '@material-ui/core/styles'
-import SocketClientContainer from '../component/SocketClientContainer'
+import Grid from '@material-ui/core/Grid'
+import ClientContainer from './ClientContainer'
 import MyInfo from './MyInfo'
+import ChatClientContainer from '../component/ChatClientContainer'
+import { Box } from '@material-ui/core'
 
 const useStyles = makeStyles({
     headings: {
@@ -32,8 +35,17 @@ function Main() {
         <Container>
             <Typography className={classes.headings} variant="h4">MyInfo</Typography>
             <MyInfo />
-            <Typography className={classes.headings} variant="h4">Socket Clients</Typography>
-            <SocketClientContainer />
+            <Typography className={classes.headings} variant="h4">Social</Typography>
+            <Grid container>
+                <Grid item xs={6}>
+                    <Typography className={classes.headings} variant="h5">Friends</Typography>
+                    <ClientContainer />
+                </Grid>
+                <Grid item xs={6}>
+                    <Typography className={classes.headings} variant="h5">Chat</Typography>
+                    <ChatClientContainer />
+                </Grid>
+            </Grid>
         </Container>
     )
 }

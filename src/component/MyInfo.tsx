@@ -1,10 +1,10 @@
-import React, {useState, useContext} from 'react'
+import React, {useEffect} from 'react'
 import {useAppSelector, useAppDispatch} from '../util/appState/hooks'
 import Button from '@material-ui/core/Button'
 import {logout, selectUser, friendOnline, setIsOnline} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
-import { useEffect } from 'react'
 import {useSocket} from '../util/customHook'
+import ChatClient from './ChatClient'
 
 function MyInfo() {
     const user = useAppSelector(selectUser)
@@ -53,6 +53,7 @@ function MyInfo() {
     return (
         <>
             <SocketClient uid={user.uid} />
+            <ChatClient uid={user.uid} />
             <Button onClick={() => {dispatch(logout())}} variant="contained" color='secondary' >logout</Button>
         </>
     )
