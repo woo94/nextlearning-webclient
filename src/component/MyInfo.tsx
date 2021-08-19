@@ -1,7 +1,9 @@
 import React, {useState, useContext} from 'react'
 import {useAppSelector, useAppDispatch} from '../util/appState/hooks'
 import Button from '@material-ui/core/Button'
-import {logout, selectUser, friendOnline, setIsOnline} from '../util/appState/userSlice'
+import ButtonGroup from '@material-ui/core/ButtonGroup'
+import Grid from '@material-ui/core/Grid'
+import {logout, selectUser, setIsOnline, friendOnline} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
 import { useEffect } from 'react'
 import {useSocket} from '../util/customHook'
@@ -9,7 +11,25 @@ import {useSocket} from '../util/customHook'
 function MyInfo() {
     const user = useAppSelector(selectUser)
     const dispatch = useAppDispatch()
-    const {isSocketAvailable, socketRef} = useSocket()
+    const {isSocketAvailable, setIsSocketAvailable, socketRef} = useSocket()
+
+    const handleConnectBtn = () => {
+        socketRef.current.connect()
+        dispatch(setIsOnline(true))
+        setIsSocketAvailable(true)
+        console.log("connect!")
+        console.log(isSocketAvailable, "isSocketAvailable")
+    }
+
+    const handleDisconnectBtn = () => {
+        if(isSocketAvailable) {
+            socketRef.current.close()
+            dispatch(setIsOnline(false))
+            setIsSocketAvailable(false)
+            console.log("disconnect!")
+            console.log(isSocketAvailable, "isSocketAvailable")
+        }
+    }
 
     useEffect(() => {
         if(!isSocketAvailable) {
@@ -17,30 +37,15 @@ function MyInfo() {
         }
         const socket = socketRef.current
 
-        dispatch(setIsOnline())
-        
-        socket.on("connect", () => {
-            console.log("socket connected / MyInfo")
-        })
-        
-        socket.on("connect_error", (err) => {
-            console.log(err)
-        })
+        dispatch(setIsOnline(true))
 
-        socket.emit("__req__set-friend-list", user.friendList.map(friend => friend.uid))
-
-        socket.on("__req__get-friend-list", (friendList: Array<{uid: string, online: string}>) => {
+        socket.emit("set-friend-list", user.friendList.map(friend => friend.uid), (friendList: Array<{ uid: string, online: boolean }>) => {
+            console.log('sres.friend-list', friendList)
             friendList.forEach(friend => {
-                dispatch(friendOnline(friend.uid))
+                if (friend.online) {
+                    dispatch(friendOnline(friend.uid))
+                }
             })
-        })
-
-        socket.on("user.online", (uid) => {
-            console.log("user.online event", uid)
-        })
-
-        socket.on("user.offline", (uid) => {
-            console.log("user.offline event", uid)
         })
 
         socket.emit("ping")
@@ -51,10 +56,18 @@ function MyInfo() {
     }, [isSocketAvailable])
     
     return (
-        <>
-            <SocketClient uid={user.uid} />
+        <Grid alignItems="center" spacing={4} container>
+            <Grid item>
+                <SocketClient uid={user.uid} />
+            </Grid>
+            <Grid item>
+                <ButtonGroup>
+                    <Button onClick={handleConnectBtn} color="primary">connect</Button>
+                    <Button onClick={handleDisconnectBtn} color="secondary">disconnect</Button>
+                </ButtonGroup>
+            </Grid>
             <Button onClick={() => {dispatch(logout())}} variant="contained" color='secondary' >logout</Button>
-        </>
+        </Grid>
     )
 }
 

@@ -32,8 +32,9 @@ function Main() {
         <Container>
             <Typography className={classes.headings} variant="h4">MyInfo</Typography>
             <MyInfo />
-            <Typography className={classes.headings} variant="h4">Socket Clients</Typography>
+            <Typography className={classes.headings} variant="h4">Socket Clients(Persistent)</Typography>
             <SocketClientContainer />
+            <Typography className={classes.headings} variant="h4">Socket Clients(Temporary)</Typography>
         </Container>
     )
 }

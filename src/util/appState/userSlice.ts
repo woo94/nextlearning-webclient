@@ -9,7 +9,6 @@ interface UserState {
     isLogin: boolean;
     name: string;
     isOnline: boolean;
-    friendsOnline: Array<string>;
 }
 
 const initialState: UserState = {
@@ -19,7 +18,6 @@ const initialState: UserState = {
     isLogin: false,
     name: '',
     isOnline: false,
-    friendsOnline: []
 }
 
 export const submitLoginInfo = createAsyncThunk(
@@ -37,6 +35,7 @@ export const getUserDoc = createAsyncThunk<firebase.default.firestore.DocumentDa
         const firestore = firebase.default.firestore()
         const userDocRef = firestore.collection("user").doc(uid)
         const userDoc = await userDocRef.get()
+        // console.log(userDoc)
         return userDoc.data()
     }
 )
@@ -73,18 +72,19 @@ export const userSlice = createSlice({
         setIsLogin: (state, action) => {
             state.isLogin = action.payload
         },
-        setIsOnline: (state) => {
-            state.isOnline = true
+        setIsOnline: (state, action) => {
+            state.isOnline = action.payload
         },
         friendOnline: (state, action) => {
             const uid = action.payload
             const idx = state.friendList.findIndex(friend => friend.uid === uid)
-            // console.log(idx, uid)
+            console.log(idx, uid)
             state.friendList[idx].isOnline = true
         },
         friendOffline: (state, action) => {
             const uid = action.payload
             const idx = state.friendList.findIndex(friend => friend.uid === uid)
+            console.log(uid, idx)
             state.friendList[idx].isOnline = false
         }
     },
@@ -104,11 +104,13 @@ export const userSlice = createSlice({
             state.idToken = <string>action.payload
         })
 
-        builder.addCase(logout.fulfilled, (state, action) => {
+        builder.addCase(logout.fulfilled, (state) => {
             state.idToken = ''
             state.isLogin = false
             state.friendList = []
             state.uid = ''
+            state.name = ""
+            state.isOnline = false
         })
     }
 })
