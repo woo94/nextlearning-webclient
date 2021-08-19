@@ -1,12 +1,12 @@
-import React, {useState, useContext} from 'react'
+import React, {useEffect} from 'react'
 import {useAppSelector, useAppDispatch} from '../util/appState/hooks'
 import Button from '@material-ui/core/Button'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Grid from '@material-ui/core/Grid'
 import {logout, selectUser, setIsOnline, friendOnline} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
-import { useEffect } from 'react'
 import {useSocket} from '../util/customHook'
+import ChatClient from './ChatClient'
 
 function MyInfo() {
     const user = useAppSelector(selectUser)

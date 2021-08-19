@@ -4,6 +4,8 @@ import Badge from '@material-ui/core/Badge'
 import FaceIcon from '@material-ui/icons/Face'
 import {useAppDispatch, useAppSelector} from '../util/appState/hooks'
 import {selectUser, setIsOnline} from '../util/appState/userSlice'
+import ButtonGroup from '@material-ui/core/ButtonGroup'
+import Button from '@material-ui/core/Button'
 
 function SocketClient(props: {uid: string}) {
     const user = useAppSelector(selectUser)
@@ -11,16 +13,29 @@ function SocketClient(props: {uid: string}) {
     const uidUser = uidList.find(elem => elem.uid === props.uid)    
 
     return (
-        <Grid container alignItems="center" spacing={4}>
-            <Grid item>
-                <h3>{uidUser?.name}</h3>
+        <>
+            <Grid container alignItems="center" spacing={4}>
+                <Grid item>
+                    <h3>{uidUser?.name}</h3>
+                </Grid>
+                <Grid item>
+                    <Badge color={uidUser?.isOnline ? "secondary" : "default"} variant="dot">
+                        <FaceIcon />
+                    </Badge>
+                </Grid>
+                <Grid item>
+                    <ButtonGroup>
+                        <Button color="primary">connect</Button>
+                        <Button color="secondary">disconnect</Button>
+                    </ButtonGroup>
+                </Grid>
             </Grid>
             <Grid item>
                 <Badge color={uidUser?.isOnline ? "secondary" : "default"} variant="dot">
                     <FaceIcon />
                 </Badge>
             </Grid>
-        </Grid>
+        </>
     )
 }
 
