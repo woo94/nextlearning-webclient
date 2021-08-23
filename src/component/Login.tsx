@@ -39,7 +39,7 @@ function Login() {
     return (
             <Container maxWidth="sm">
                 <Typography className={classes.login} variant="h3" align="center">
-                    NextLearning.socket
+                    NextLearning.community
                 </Typography>
 
                 <div className={classes.inputDivs} >

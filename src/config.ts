@@ -1,5 +1,5 @@
-// const ENV: string = "production"
-const ENV: string = "development"
+const ENV: string = "production"
+// const ENV: string = "development"
 
 const SOCKET_SERVER_URL = ENV === "development" ? "http://localhost:8080/presence" : "https://redis-socket-fwxiejqt4q-uc.a.run.app/presence"
 const PORT = 8080

@@ -23,17 +23,6 @@ function SocketClient(props: {uid: string}) {
                         <FaceIcon />
                     </Badge>
                 </Grid>
-                <Grid item>
-                    <ButtonGroup>
-                        <Button color="primary">connect</Button>
-                        <Button color="secondary">disconnect</Button>
-                    </ButtonGroup>
-                </Grid>
-            </Grid>
-            <Grid item>
-                <Badge color={uidUser?.isOnline ? "secondary" : "default"} variant="dot">
-                    <FaceIcon />
-                </Badge>
             </Grid>
         </>
     )

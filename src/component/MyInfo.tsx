@@ -5,7 +5,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup'
 import Grid from '@material-ui/core/Grid'
 import {logout, selectUser, setIsOnline, friendOnline} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
-import {useSocket} from '../util/customHook'
+import {useSocket} from '../util/useSocketHook'
 import ChatClient from './ChatClient'
 
 function MyInfo() {
@@ -56,18 +56,23 @@ function MyInfo() {
     }, [isSocketAvailable])
     
     return (
-        <Grid alignItems="center" spacing={4} container>
-            <Grid item>
-                <SocketClient uid={user.uid} />
+        <>
+            <Grid alignItems="center" spacing={4} container>
+                <Grid item>
+                    <SocketClient uid={user.uid} />
+                </Grid>
+                <Grid item>
+                    <ButtonGroup>
+                        <Button onClick={handleConnectBtn} color="primary">connect</Button>
+                        <Button onClick={handleDisconnectBtn} color="secondary">disconnect</Button>
+                    </ButtonGroup>
+                </Grid>
+                <Button onClick={() => { dispatch(logout()) }} variant="contained" color='secondary' >logout</Button>
             </Grid>
-            <Grid item>
-                <ButtonGroup>
-                    <Button onClick={handleConnectBtn} color="primary">connect</Button>
-                    <Button onClick={handleDisconnectBtn} color="secondary">disconnect</Button>
-                </ButtonGroup>
+            <Grid>
+                <ChatClient uid={user.uid} />
             </Grid>
-            <Button onClick={() => {dispatch(logout())}} variant="contained" color='secondary' >logout</Button>
-        </Grid>
+        </>
     )
 }
 

@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import {RootState} from './Store'
-import firebase from '../../firebase'
+import app from '../../firebase'
 
 interface UserState {
     idToken: string;
@@ -23,7 +23,7 @@ const initialState: UserState = {
 export const submitLoginInfo = createAsyncThunk(
     'user/submitLoginInfo',
     async (info:{email: string, password: string}) => {
-        const auth = firebase.default.auth()
+        const auth = app.auth()
         const userCredential = await auth.signInWithEmailAndPassword(info.email, info.password)
         return userCredential.user?.uid
     }
@@ -32,7 +32,7 @@ export const submitLoginInfo = createAsyncThunk(
 export const getUserDoc = createAsyncThunk<firebase.default.firestore.DocumentData, string, {}>(
     'user/getUserDoc',
     async (uid: string) => {
-        const firestore = firebase.default.firestore()
+        const firestore = app.firestore()
         const userDocRef = firestore.collection("user").doc(uid)
         const userDoc = await userDocRef.get()
         // console.log(userDoc)
@@ -43,7 +43,7 @@ export const getUserDoc = createAsyncThunk<firebase.default.firestore.DocumentDa
 export const getIdToken = createAsyncThunk(
     'user/getIdToken',
     async () => {
-        const auth = firebase.default.auth()
+        const auth = app.auth()
         return await auth.currentUser?.getIdToken()
     }
 )
@@ -51,7 +51,7 @@ export const getIdToken = createAsyncThunk(
 export const logout = createAsyncThunk(
     'user/logout',
     async() => {
-        const auth = firebase.default.auth()
+        const auth = app.auth()
         await auth.signOut()
     }
 )
