@@ -36,17 +36,9 @@ function MyInfo() {
             return
         }
         const socket = socketRef.current
-
         dispatch(setIsOnline(true))
 
-        socket.emit("set-friend-list", user.friendList.map(friend => friend.uid), (friendList: Array<{ uid: string, online: boolean }>) => {
-            console.log('sres.friend-list', friendList)
-            friendList.forEach(friend => {
-                if (friend.online) {
-                    dispatch(friendOnline(friend.uid))
-                }
-            })
-        })
+        socket.emit("creq.init-friend_list", user.friendList.map(friend => friend.uid))
 
         socket.emit("ping")
 

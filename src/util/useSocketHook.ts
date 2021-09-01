@@ -4,11 +4,25 @@ import { useAppSelector, useAppDispatch } from './appState/hooks'
 import {selectUser, friendOnline, friendOffline} from './appState/userSlice'
 import {SOCKET_SERVER_URL} from '../config'
 
+interface Friend {
+    uid: string;
+    online: boolean;
+}
+
 export function useSocket() {
     const user = useAppSelector(selectUser)
     const socketRef = useRef(io({autoConnect: false}))
     const [isSocketAvailable, setIsSocketAvailable] = useState(false)
     const dispatch = useAppDispatch()
+
+    const dispatchFriendList = (friendList: Array<Friend>) => {
+        console.log(friendList)
+        friendList.forEach(friend => {
+            if(friend.online) {
+                dispatch(friendOnline(friend.uid))
+            }
+        })
+    }
 
     useEffect(() => {
         console.log(user.idToken.length)
@@ -21,6 +35,9 @@ export function useSocket() {
             extraHeaders: {
                 Authorization: `bearer ${user.idToken}`
             },
+            auth: {
+                uid: user.uid
+            },
             autoConnect: true
         })
 
@@ -28,6 +45,7 @@ export function useSocket() {
         
         setIsSocketAvailable(true)
 
+        // connection and handshake events
         socket.on("connect", () => {
             console.log("socket connected / MyInfo")
         })
@@ -36,6 +54,7 @@ export function useSocket() {
             console.log(err)
         })
 
+        // broadcast events
         socket.on("broadcast:user.online", (uid) => {
             console.log("broadcast:user.online event", uid)
             if(uid === user.uid) {
@@ -51,6 +70,12 @@ export function useSocket() {
             }
             dispatch(friendOffline(uid))
         })
+
+        socket.on("sres.init-friend_list", dispatchFriendList)
+
+        socket.on("sres.get-friend_list", dispatchFriendList)
+
+        socket.on("sres.add-friend", dispatchFriendList)
 
         return () => {
             console.log('clean up socket')
