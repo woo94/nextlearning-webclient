@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid'
 import {logout, selectUser, setIsOnline, friendOnline} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
 import {useSocket} from '../util/useSocketHook'
-import ChatClient from './ChatClient'
+
 
 function MyInfo() {
     const user = useAppSelector(selectUser)
@@ -60,9 +60,6 @@ function MyInfo() {
                     </ButtonGroup>
                 </Grid>
                 <Button onClick={() => { dispatch(logout()) }} variant="contained" color='secondary' >logout</Button>
-            </Grid>
-            <Grid>
-                <ChatClient uid={user.uid} />
             </Grid>
         </>
     )

@@ -9,7 +9,6 @@ import Grid from '@material-ui/core/Grid'
 import ClientContainer from './ClientContainer'
 import MyInfo from './MyInfo'
 import { Box } from '@material-ui/core'
-import ChatClientContainer from './ChatListContainer'
 
 const useStyles = makeStyles({
     headings: {
@@ -41,7 +40,7 @@ function Main() {
                     <ClientContainer />
                 </Grid>
                 <Grid item xs={6}>
-                    <ChatClientContainer />
+                    
                 </Grid>
             </Grid>
             

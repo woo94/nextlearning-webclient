@@ -79,13 +79,17 @@ export const userSlice = createSlice({
             const uid = action.payload
             const idx = state.friendList.findIndex(friend => friend.uid === uid)
             console.log(idx, uid)
-            state.friendList[idx].isOnline = true
+            if(idx !== -1) {
+                state.friendList[idx].isOnline = true
+            }
         },
         friendOffline: (state, action) => {
             const uid = action.payload
             const idx = state.friendList.findIndex(friend => friend.uid === uid)
             console.log(uid, idx)
-            state.friendList[idx].isOnline = false
+            if(idx !== -1) {
+                state.friendList[idx].isOnline = false
+            }
         }
     },
 
