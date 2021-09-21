@@ -38,7 +38,7 @@ function MyInfo() {
         const socket = socketRef.current
         dispatch(setIsOnline(true))
 
-        socket.emit("creq.init-friend_list", user.friendList.map(friend => friend.uid))
+        socket.emit("creq.init-friend_list", JSON.stringify({data: user.friend_list.map(friend => friend.uid)}))
 
         socket.emit("ping")
 
@@ -60,9 +60,6 @@ function MyInfo() {
                     </ButtonGroup>
                 </Grid>
                 <Button onClick={() => { dispatch(logout()) }} variant="contained" color='secondary' >logout</Button>
-            </Grid>
-            <Grid>
-                <ChatClient uid={user.uid} />
             </Grid>
         </>
     )

@@ -20,12 +20,6 @@ function ChatClient(props: {uid: string}) {
 
     const app = useRef<firebase.default.app.App>()
 
-    useEffect(() => {
-        app.current = firebase.default.initializeApp({
-            databaseURL: getPrivateChatInstanceById(user.uid).url
-        }, props.uid)
-    },[])
-
     const sendChat = () => {
         const message: ChatSchema.PrivateMessage = {
             sender: user.uid,

@@ -9,11 +9,11 @@ function ClientContainer() {
 
     return (
         <React.Fragment>
-        {user.friendList.map(friend => {
+        {user.friend_list.map(friend => {
             return (
                 <React.Fragment key={friend.uid}>
                 <SocketClient key={`socket.${friend.uid}`} uid={friend.uid} />
-                <ChatClient key={`chat.${friend.uid}`} uid={friend.uid} />
+                {/* <ChatClient key={`chat.${friend.uid}`} uid={friend.uid} /> */}
                 </React.Fragment>
             )
         })}
