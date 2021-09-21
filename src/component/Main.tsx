@@ -6,7 +6,6 @@ import {BottomNavigation, BottomNavigationAction, Grid, Typography, Container, A
 import {makeStyles} from '@material-ui/core/styles'
 import ClientContainer from './ClientContainer'
 import MyInfo from './MyInfo'
-import ChatClientContainer from './ChatListContainer'
 import '../firebase'
 import {Home as HomeIcon, AccountCircle, Favorite, StarHalf, PinDropSharp} from '@material-ui/icons'
 import {BrowserRouter as Router, Route, useHistory} from 'react-router-dom'
@@ -67,7 +66,6 @@ function Main() {
 
     return (
         <Container>
-<<<<<<< HEAD
             {
                 content()   
             }
@@ -87,21 +85,6 @@ function Main() {
                     </Tabs>
                 </AppBar>
             </Box>
-=======
-            <Typography className={classes.headings} variant="h4">MyInfo</Typography>
-            <MyInfo />
-            <Typography className={classes.headings} variant="h4">Socket Clients(Persistent)</Typography>
-            <Grid container>
-                <Grid item xs={6}>
-                    <ClientContainer />
-                </Grid>
-                <Grid item xs={6}>
-                    
-                </Grid>
-            </Grid>
-            
-            <Typography className={classes.headings} variant="h4">Socket Clients(Temporary)</Typography>
->>>>>>> fdf3a8a7440954b3d1c2f53fece34da65e3425e5
         </Container>
     )
 }
