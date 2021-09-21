@@ -2,7 +2,6 @@ import React from 'react'
 import {useAppSelector} from '../util/appState/hooks'
 import {selectUser} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
-import ChatClient from './ChatClient'
 
 function ClientContainer() {
     const user = useAppSelector(selectUser)

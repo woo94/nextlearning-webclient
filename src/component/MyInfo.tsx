@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid'
 import {logout, selectUser, setIsOnline, friendOnline} from '../util/appState/userSlice'
 import SocketClient from './SocketClient'
 import {useSocket} from '../util/useSocketHook'
-import ChatClient from './ChatClient'
+
 
 function MyInfo() {
     const user = useAppSelector(selectUser)
