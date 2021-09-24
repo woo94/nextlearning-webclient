@@ -1,15 +1,15 @@
 import React, {useContext} from 'react'
 import { Typography, Avatar, Grid, Badge, Box, Button, IconButton } from '@material-ui/core'
 import {Stack, Paper} from '@mui/material'
-import { Add, ArrowForwardIos } from '@material-ui/icons'
+import { Add, ArrowForwardIos } from '@mui/icons-material'
 import { useAppSelector } from '../../../util/appState/hooks'
 import { selectUser } from '../../../util/appState/userSlice'
-import {ViewContext} from './ViewContext'
+import {Link, useRouteMatch} from 'react-router-dom'
 
 
 function FriendsOnline() {
     const user = useAppSelector(selectUser)
-    const { viewTracer, modifyViewTracer } = useContext(ViewContext)
+    const {url} = useRouteMatch()
 
     return (
         <>
@@ -18,17 +18,18 @@ function FriendsOnline() {
                     <Grid item>
                         <Typography variant="h6" >
                             Friends Online
-                            { }
                         </Typography>
                     </Grid>
                     <Grid item xs={4} ></Grid>
                     <Grid item>
-                        <IconButton onClick={() => modifyViewTracer([...viewTracer, 'friend-list'])} > <ArrowForwardIos /> </IconButton>
+                        <Link to={`${url}/friend-list`} >
+                        <IconButton> <ArrowForwardIos /> </IconButton>
+                        </Link>
                     </Grid>
                 </Grid>
             </Box>
             <Stack direction="row" spacing={1} >
-                {user.friend_list.filter(friend => friend.isOnline === false).map(({ name }) => {
+                {user.friend_list.filter(friend => friend.online === true).map(({ name }) => {
                     return (
                         <Box textAlign="center" >
                             <Button  >
@@ -44,11 +45,13 @@ function FriendsOnline() {
                 })}
                 {
                     <Grid item>
-                        <Box onClick={() => modifyViewTracer([...viewTracer, 'add-friend'])} textAlign="center" >
+                        <Box textAlign="center" >
                             <Button>
-                                <Avatar variant="rounded"> <Add /> </Avatar>
+                                <Link to={`${url}/add-friend`}>
+                                    <Avatar variant="rounded"> <Add /> </Avatar>
+                                </Link>
                             </Button>
-                            <Typography variant="body2">
+                            <Typography variant="body1">
                                 Add
                             </Typography>
                         </Box>

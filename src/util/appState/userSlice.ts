@@ -4,18 +4,22 @@ import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 
-interface PublicInfo {
+export interface PublicInfo {
     name: string;
     email: string;
     uid: string;
     img: string;
 }
 
-interface UserState extends PublicInfo {
+export interface Friend extends PublicInfo {
+    online: boolean;
+}
+
+export interface UserState extends PublicInfo {
     idToken: string;
-    friend_list: Array<PublicInfo & { isOnline: boolean }>;
+    friend_list: Array<PublicInfo & { online: boolean }>;
     isLogin: boolean;
-    isOnline: boolean;
+    online: boolean;
     friend_request: {
         sent: Array<PublicInfo & {tp: number}>;
         received: Array<PublicInfo & {tp: number}>
@@ -30,7 +34,7 @@ const initialState: UserState = {
     friend_list: [],
     isLogin: false,
     name: '',
-    isOnline: false,
+    online: false,
     friend_request: {
         sent: [],
         received: []
@@ -112,19 +116,19 @@ export const userSlice = createSlice({
             state.isLogin = action.payload
         },
         setIsOnline: (state, action) => {
-            state.isOnline = action.payload
+            state.online = action.payload
         },
         friendOnline: (state, action) => {
             const uid = action.payload
             const idx = state.friend_list.findIndex(friend => friend.uid === uid)
             console.log(idx, uid)
-            state.friend_list[idx].isOnline = true
+            state.friend_list[idx].online = true
         },
         friendOffline: (state, action) => {
             const uid = action.payload
             const idx = state.friend_list.findIndex(friend => friend.uid === uid)
             console.log(uid, idx)
-            state.friend_list[idx].isOnline = false
+            state.friend_list[idx].online = false
         }
     },
 
@@ -136,9 +140,9 @@ export const userSlice = createSlice({
 
         builder.addCase(getUserDoc.fulfilled, (state, action) => {
             const friendsInfo = <Array<firebase.firestore.DocumentData>>action.payload.friendsInfoData
-            state.friend_list = action.payload.userData["friend_list"].map((uid: string): PublicInfo & {isOnline: boolean} => {
+            state.friend_list = action.payload.userData["friend_list"].map((uid: string): PublicInfo & {online: boolean} => {
                 const friend = friendsInfo.find(val => val.uid === uid)
-                return { uid, isOnline: false, name: friend?.name, email: friend?.email, img: friend?.img } 
+                return { uid, online: false, name: friend?.name, email: friend?.email, img: friend?.img } 
             })
 
             state.friend_request.sent = action.payload.friendRequestDocData["sent"].map((user: { uid: string, tp: number}) => {
@@ -175,7 +179,7 @@ export const userSlice = createSlice({
             state.friend_list = []
             state.uid = ''
             state.name = ""
-            state.isOnline = false
+            state.online = false
         })
     }
 })

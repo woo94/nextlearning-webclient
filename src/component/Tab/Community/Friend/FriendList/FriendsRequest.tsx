@@ -1,14 +1,13 @@
 import React from 'react'
-import {useAppSelector} from '../../../../util/appState/hooks'
-import {selectUser}  from '../../../../util/appState/userSlice'
+import {useAppSelector} from '../../../../../util/appState/hooks'
+import {selectUser}  from '../../../../../util/appState/userSlice'
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import Typography from '@mui/material/Typography'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
-import ViewChanger, {Props} from '../../../Common/ViewChanger'
-import {ViewContext} from '../ViewContext'
+import TopController, {Props} from '../../../../Common/TopController'
 import ReceivedRequest from './ReceivedRequest'
 import SentRequest from './SentRequest'
 
@@ -21,13 +20,12 @@ function FriendsRequest() {
     const user = useAppSelector(selectUser)
     const viewChangerProps: Props = {
         text: 'Friend requests',
-        actions: [],
-        context: ViewContext
+        actions: []
     }
 
     return (
         <>
-            <ViewChanger {...viewChangerProps} />
+            <TopController {...viewChangerProps} />
             <Typography variant="subtitle1">
                 Received Requests
             </Typography>

@@ -1,81 +1,40 @@
 import React, { useState } from 'react'
 import FriendsOnline from './FriendsOnline'
-import FriendsList from './FriendsList'
-import AddFriend from './AddFriend'
-import FriendsRequest from './FriendsList/FriendsRequest'
+import FriendList from './Friend/FriendList'
+import AddFriend from './Friend/AddFriend'
+import FriendsRequest from './Friend/FriendList/FriendsRequest'
 import {Container} from '@material-ui/core'
-import {ViewContext} from './ViewContext'
-import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
+import {BrowserRouter as Router, Switch, Route, Link, useRouteMatch} from 'react-router-dom'
+import TopController from '../../Common/TopController'
+import MyStudyGroup from './MyStudyGroup'
+import StudyGroupList from './StudyGroup/StudyGroupList'
+import AddStudyGroup from './StudyGroup/AddStudyGroup'
 
 export function Community() {
-    const [viewTracer, setViewTracer] = useState([''])
-
-    let currentView: JSX.Element
-
-    switch (viewTracer[viewTracer.length - 1]) {
-        case '':
-            currentView = 
-            <>
-                <FriendsOnline />
-                <h3>This is community tab</h3>
-                <Router>
-                    <div>
-                        <ul>
-                            <li>
-                                <Link to="/">Home</Link>
-                            </li>
-                            <li>
-                                <Link to="/topics">Topics</Link>
-                            </li>
-                        </ul>
-
-                        <hr />
-
-                        <Switch>
-                            <Route exact path="/">
-                                <div></div>
-                            </Route>
-                            <Route path="/topics">
-                                <div></div>
-                            </Route>
-                        </Switch>
-                    </div>
-                </Router>
-            </>
-            break
-        case 'friend-list':
-            currentView =
-            <>
-                <FriendsList />
-            </>
-            break
-        case 'add-friend':
-            currentView = 
-            <>
-                <AddFriend />
-            </>
-            break
-        case 'requests':
-            currentView = 
-            <>
-                <FriendsRequest />
-            </>
-            break
-        default:
-            currentView = 
-            <>
-                <FriendsOnline />
-                <h3>This is community tab</h3>          
-            </>
-            break
-    }
+    const {url} = useRouteMatch()
 
     return (
-        <ViewContext.Provider value={{viewTracer, modifyViewTracer:(tracer: Array<string>) => {setViewTracer(tracer)}}}>
-            <Container maxWidth="sm" >
-                {currentView}
-            </Container>
-        </ViewContext.Provider>
+        <Container maxWidth="sm" >
+            <Switch>
+                <Route exact path='/community'>
+                    <FriendsOnline />
+                    <MyStudyGroup />
+                </Route>
+                <Route path={`${url}/add-friend`} >
+                    <AddFriend />
+                </Route>
+                <Route path={`${url}/friend-list`}>
+                    <FriendList />
+                </Route>
+                <Route path={`${url}/study-group`}>
+                    <StudyGroupList />
+                </Route>
+                <Route path={`${url}/add-study-group`}>
+                    <AddStudyGroup />
+                </Route>
+            </Switch>
+        </Container>
+        
     )
     
 }

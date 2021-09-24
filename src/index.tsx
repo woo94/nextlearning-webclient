@@ -5,10 +5,13 @@ import reportWebVitals from './reportWebVitals';
 import "@fontsource/roboto"
 import {Provider} from 'react-redux'
 import AppStore from './util/appState/Store'
+import {BrowserRouter as Router} from 'react-router-dom'
 
 ReactDOM.render(
   <Provider store={AppStore}>
+    <Router>
     <App />
+    </Router>
   </Provider>,
   document.getElementById('root')
 );

@@ -1,88 +1,90 @@
-import React, {useState} from 'react'
+import React, {useState, useContext} from 'react'
 import { useEffect } from 'react'
 import {useAppDispatch, useAppSelector} from '../util/appState/hooks'
 import {selectUser, getUserDoc, getIdToken} from '../util/appState/userSlice'
-import {BottomNavigation, BottomNavigationAction, Grid, Typography, Container, AppBar, Toolbar, Tabs, Tab, Box} from '@material-ui/core'
-import {makeStyles} from '@material-ui/core/styles'
-import ClientContainer from './ClientContainer'
-import MyInfo from './MyInfo'
+import {Grid, Typography, Container, AppBar, Toolbar, Tab, Box, SvgIconTypeMap} from '@mui/material'
 import '../firebase'
-import {Home as HomeIcon, AccountCircle, Favorite, StarHalf, PinDropSharp} from '@material-ui/icons'
-import {BrowserRouter as Router, Route, useHistory} from 'react-router-dom'
+import {Home as HomeIcon, AccountCircle, Favorite, StarHalf, PinDropSharp} from '@mui/icons-material'
+import {BrowserRouter as Router, Route, useHistory, Switch, Link} from 'react-router-dom'
 import {Home, Community, Profile, Challenge} from './Tab'
-// import {createBrowserHistory} from 'history'
+import {SocketContext} from '../socket/context'
 
-// const history = createBrowserHistory()
 
-const useStyles = makeStyles({
-    headings: {
-        margin: "2rem 0"
-    },
-    bottomNav: {
-        top: 'auto',
-        bottom: 0
-    }
-})
+interface NavItemProps {
+    linkTo: string;
+    navTitle: string;
+    tabValue: string;
+    icon: string | React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+    handler: () => void;
+}
 
-// let content = <Home />
+function NavItem(props: NavItemProps) {
+    const {linkTo, handler, navTitle, tabValue, icon} = props
+    return (
+        <Grid flexGrow={1} item>
+            <Link onClick={handler} style={{textDecoration: 'none'}} to={linkTo} >
+                <Tab sx={{color: navTitle === tabValue ? 'black' : 'white', width: '100%'}} value={navTitle} label={navTitle} icon={icon} />
+            </Link>
+        </Grid>
+    )
+}
 
 function Main() {
     const user = useAppSelector(selectUser)
     const dispatch = useAppDispatch()
     const [nav, setNav] = useState('home')
-    const classes = useStyles()
     const [navDisplay, setNavDisplay] = useState('block')
 
     useEffect(() => {
-        const uid = user.uid
-        const run = async () => {
-            await dispatch(getUserDoc(uid))
+        if(user.idToken === "") {
+            run()
+        }
+        async function run() {
+            await dispatch(getUserDoc(user.uid))
             await dispatch(getIdToken())
         }
-        run()
-    }, [])
+    }, [user.idToken])
 
-    const handleNavChange = (event: React.ChangeEvent<{}>, value: string) => {
-        setNav(value)
-    }
+    const {isSocketAvailable, socket} = useContext(SocketContext)
 
-    const content = () => {
-        let content;
-        switch(nav) {
-            case 'home':
-                content = <Home />
-                break
-            case 'community':
-                content = <Community />
-                break            
-            case 'profile':
-                content = <Profile />
-                break
-            case 'challenge':
-                content = <Challenge />
+    useEffect(() => {
+        if(!isSocketAvailable) {
+            return
         }
-        return content
-    }
+
+        socket.emit("creq.init-friend_list", JSON.stringify({data: user.friend_list.map(friend => friend.uid)}))
+        
+        return () => {
+            console.log(`close socket ${socket.id}`)
+            socket.close()
+        }
+    },[isSocketAvailable])
 
     return (
         <Container>
-            {
-                content()   
-            }
-            <button onClick={(e) => {if(navDisplay === "block") {setNavDisplay("none")} else {setNavDisplay("block")}}} >oh</button>
+            <Switch>
+                <Route exact path='/'>
+                    <Home />
+                </Route>
+                <Route path='/challenge'>
+                    <Challenge />
+                </Route>
+                <Route path='/community'>
+                    <Community />
+                </Route>
+                <Route path='/profile'>
+                    <Profile />
+                </Route>
+            </Switch>
+
             <Box display={navDisplay} >
-                <AppBar position="fixed" className={classes.bottomNav} >
-                    <Tabs
-                        value={nav}
-                        onChange={handleNavChange}
-                        centered
-                        variant="fullWidth"
-                    >
-                        <Tab value="home" label="Home" icon={<HomeIcon />} />
-                        <Tab value="challenge" label="Challenge" icon={<Favorite />} />
-                        <Tab value="community" label="Community" icon={<StarHalf />} />
-                        <Tab value="profile" label="Profile" icon={<AccountCircle />} />
-                    </Tabs>
+                <AppBar position="fixed" sx={{ top: 'auto', bottom: 0 }} >
+                    <Grid container>
+                        <NavItem handler={() => {setNav('home')}} linkTo="/" navTitle={"home"} tabValue={nav} icon={<HomeIcon />} />
+                        <NavItem handler={() => {setNav('challenge')}} linkTo="/community" navTitle={"challenge"} tabValue={nav} icon={<Favorite />} />
+                        <NavItem handler={() => {setNav('community')}} linkTo="/community" navTitle={"community"} tabValue={nav} icon={<StarHalf />} />
+                        <NavItem handler={() => {setNav('profile')}} linkTo="/profile" navTitle={"profile"} tabValue={nav} icon={<AccountCircle />} />
+                    </Grid>
                 </AppBar>
             </Box>
         </Container>

@@ -12,7 +12,7 @@ import 'firebase/firestore'
 function SocketClient(props: {uid: string}) {
     const user = useAppSelector(selectUser)
     const [userName, setUserName] = useState('')
-    const userList = user.friend_list.concat([{ uid: user.uid, isOnline: user.isOnline, name: user.name, img: user.img, email: user.email }])
+    const userList = user.friend_list.concat([{ uid: user.uid, online: user.online, name: user.name, img: user.img, email: user.email }])
     const uidUser = userList.find(user => user.uid === props.uid)
     
     useEffect(() => {
@@ -36,7 +36,7 @@ function SocketClient(props: {uid: string}) {
                     <h3>{userName}</h3>
                 </Grid>
                 <Grid item>
-                    <Badge color={uidUser?.isOnline ? "secondary" : "default"} variant="dot">
+                    <Badge color={uidUser?.online ? "secondary" : "default"} variant="dot">
                         <FaceIcon />
                     </Badge>
                 </Grid>

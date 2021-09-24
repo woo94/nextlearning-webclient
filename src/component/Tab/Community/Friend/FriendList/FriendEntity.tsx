@@ -9,14 +9,14 @@ interface Props {
     uid: string;
     email: string;
     img: string;
-    isOnline: boolean
+    online: boolean
 }
 
 function FriendEntity(props: Props) {
     return (
         <ListItem>
             <ListItemAvatar>
-                { props.isOnline ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />}
+                { props.online ? <AccountCircleIcon /> : <AccountCircleOutlinedIcon />}
             </ListItemAvatar>
             <ListItemText primary={props.name} /> 
         </ListItem>
