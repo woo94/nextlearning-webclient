@@ -4,7 +4,7 @@ import MultiActionController from "./MultiActionController"
 import {Props} from './util'
 import Box from '@mui/material/Box'
 
-function ViewChanger(props: Props) {
+function TopController(props: Props) {
     if(props.actions.length <= 1) {
         return (
             <Box pt={1} pb={2} >
@@ -21,5 +21,5 @@ function ViewChanger(props: Props) {
     }
 }
 
-export default ViewChanger
+export default TopController
 export * from './util'

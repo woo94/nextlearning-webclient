@@ -6,19 +6,18 @@ import Box from '@mui/material/Box'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import {Props} from './util'
+import {useHistory} from 'react-router-dom'
 
 function MultiActionController(props: Props) {
-    const viewContext = useContext(props.context)
-    const viewTracer = [...viewContext.viewTracer]
+    const history = useHistory()
 
     const handleBackBtn = () => {
-        viewTracer.pop()
-        viewContext.modifyViewTracer([...viewTracer])
+       history.goBack()
     }
 
     const handleAction = () => {
-        viewTracer.push(props.actions[0].view)
-        viewContext.modifyViewTracer(viewTracer)
+        // viewTracer.push(props.actions[0].view)
+        // viewContext.modifyViewTracer(viewTracer)
     }
 
     return (

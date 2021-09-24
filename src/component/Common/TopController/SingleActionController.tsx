@@ -6,24 +6,16 @@ import Box from '@mui/material/Box'
 import AddIcon from '@mui/icons-material/Add'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import {Props} from './util'
+import {useHistory, Link} from 'react-router-dom'
 
 function SingleActionController(props: Props) {
-    const viewContext = useContext(props.context)
-    const viewTracer = [...viewContext.viewTracer]
+    const history = useHistory()
 
     const handleBackBtn = () => {
-        viewTracer.pop()
-        viewContext.modifyViewTracer([...viewTracer])
+        history.goBack()
     }
 
-    const handleAction = () => {
-        if(props.actions.length === 0) {
-            return
-        }
-        viewTracer.push(props.actions[0].view)
-        viewContext.modifyViewTracer(viewTracer)
-    }
-
+   
     return (
         <Grid container alignItems="center" >
             <Grid item>
@@ -36,10 +28,12 @@ function SingleActionController(props: Props) {
             </Grid>
             <Grid item xs={4}></Grid>
             {
-                props.actions.length > 0
+                props.actions.length === 1
                     ?
-                    <Grid>
-                        <IconButton onClick={handleAction}><AddIcon /></IconButton>
+                    <Grid item>
+                        <Link to={props.actions[0].routes}>
+                            <AddIcon />
+                        </Link>
                     </Grid>
                     :
                     null
