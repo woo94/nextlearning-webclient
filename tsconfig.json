@@ -18,7 +18,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+
+    // to avoid using relative path(too many ../ s)
+    // set baseUrl as project's root directory lets us much easier to import modules
+    "baseUrl": "."
   },
   "include": [
     "src"
