@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // match /{document=**} {
+    //   allow read, write: if
+    //       request.time < timestamp.date(2021, 8, 19);
+    // }
+    
+    match /user/{userId} {
+    	allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      match /monthly_task/{yearMonth} {
+      	allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      match /task/{yearMonth} {
+      	allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      match /public/info {
+      	allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      match /public/friend_request {
+      	allow read: if request.auth.uid == userId;
+        allow write: if request.auth.uid == userId;
+      }
+    }
+    
+    match /study_group/{groupId} {
+    	allow read, write: if exists(/database/$(database)/documents/user/$(request.auth.uid)/my_study_group/$(groupId));
+    }
+  }
+}
