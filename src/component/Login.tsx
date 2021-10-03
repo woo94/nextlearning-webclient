@@ -14,7 +14,7 @@ const useStyles = makeStyles({
         margin: "1rem 0"
     },
     login: {
-        margin: "4rem 0"
+        padding: "4rem 0"
     }
 })
 
@@ -39,7 +39,7 @@ function Login() {
     return (
             <Container maxWidth="sm">
                 <Typography className={classes.login} variant="h3" align="center">
-                    NextLearning.community
+                    NextLearning.webClient
                 </Typography>
 
                 <div className={classes.inputDivs} >
