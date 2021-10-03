@@ -6,5 +6,6 @@ export const firebaseConfig = {
     storageBucket: "nextlearning-505ce.appspot.com",
     messagingSenderId: "997722786305",
     appId: "1:997722786305:web:4e5b7c7363724f24278e00",
-    measurementId: "G-XEG13R91P1"
+    measurementId: "G-XEG13R91P1",
+    databaseURL: "https://nextlearning-505ce-study-group-ch1.firebaseio.com/"
 };
