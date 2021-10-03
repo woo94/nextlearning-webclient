@@ -1,6 +1,6 @@
 import React from 'react'
 import {useAppSelector} from '../../../../../util/appState/hooks'
-import {selectUser}  from '../../../../../util/appState/userSlice'
+import { selectFriend } from '../../../../../util/appState/friendSlice' 
 import Divider from '@mui/material/Divider'
 import List from '@mui/material/List'
 import Typography from '@mui/material/Typography'
@@ -17,7 +17,7 @@ dayjs.extend(timezone)
 const guessedTimezone = dayjs.tz.guess()
 
 function FriendsRequest() {
-    const user = useAppSelector(selectUser)
+    const friend = useAppSelector(selectFriend)
     const viewChangerProps: Props = {
         text: 'Friend requests',
         actions: []
@@ -31,7 +31,7 @@ function FriendsRequest() {
             </Typography>
             <List>
                 {
-                    user.friend_request.received.map(req => {
+                    friend.friend_request.received.map(req => {
                         const dayjsObj = dayjs.unix(req.tp).tz(guessedTimezone)
 
                         return (
@@ -46,7 +46,7 @@ function FriendsRequest() {
             </Typography>
             <List>
                 {
-                    user.friend_request.sent.map(req => {
+                    friend.friend_request.sent.map(req => {
                         const dayjsObj = dayjs.unix(req.tp).tz(guessedTimezone)
 
                         return (

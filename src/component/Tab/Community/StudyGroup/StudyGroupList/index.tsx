@@ -1,30 +1,42 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import TopController from '../../../../Common/TopController'
-import {useHistory} from 'react-router-dom'
+import {useHistory, useRouteMatch, Switch, Route} from 'react-router-dom'
 import {Grid, Typography, IconButton, Dialog, Button, DialogTitle, DialogContent, DialogActions, TextField, Box} from '@mui/material'
 import {ArrowBackIos, Add } from '@mui/icons-material'
-import * as Sendbird from 'sendbird'
+import {useAppSelector, useAppDispatch} from 'src/util/appState/hooks'
+import {selectUser} from 'src/util/appState/userSlice'
+import {addStudyGroup} from 'src/util/appState/studyGroupSlice'
+import {getFunctions, httpsCallable} from 'firebase/functions'
+import {User} from 'src/util/types'
+import GroupChatRoom from '../GroupChatRoom'
 
 function StudyGroupList() {
     const history = useHistory()
     const [openModal, setOpenModal] = useState(false)
-    const [sb, setSb] = useState(Sendbird.default.getInstance())
-    const [createGroupText, setCreateGroupText] = useState('')
+    const [createGroupTitle, setCreateGroupTitle] = useState('')
+    const user = useAppSelector(selectUser)
+    const dispatch = useAppDispatch()
+    const {path} = useRouteMatch()
 
     const handleBackBtn = () => {
         history.goBack()
     }
 
-    const createStudyGroup = () => {
-        const userIds = [sb.currentUser.userId]
-        sb.GroupChannel.createChannelWithUserIds(userIds, false, createGroupText, '', '', '', (groupChannel, error) => {
-            if(error) {
-                console.log(error)
-                return
-            }
-            console.log(groupChannel)
-            console.log(`group channel ${createGroupText} has created`)
+    const createStudyGroup = async () => {
+        const functions = getFunctions()
+        const myName = user.name
+
+        const create_study_group = httpsCallable(functions, "create_study_group")
+        const myStudyGroupDoc = await create_study_group({
+            title: createGroupTitle,
+            description: "",
+            img: "",
+            myName
         })
+        
+        dispatch(addStudyGroup(myStudyGroupDoc))
+        setOpenModal(false)
+        setCreateGroupTitle('')
     }
 
     return (
@@ -59,7 +71,7 @@ function StudyGroupList() {
                                 <Button>Upload group image</Button>
                             </Grid>
                             <Grid sx={{my: 2}} item>
-                                <TextField value={createGroupText} onChange={(e) => {setCreateGroupText(e.target.value)}} variant="standard" />
+                                <TextField value={createGroupTitle} onChange={(e) => {setCreateGroupTitle(e.target.value)}} variant="standard" />
                             </Grid>
                             <Grid sx={{my: 2}} item>
                                 <Button onClick={createStudyGroup} variant="contained" size="large">create</Button>
@@ -68,6 +80,8 @@ function StudyGroupList() {
                     </Box>
                 </DialogContent>
             </Dialog>
+
+            
         <div>Study group list</div>
         </>
     )

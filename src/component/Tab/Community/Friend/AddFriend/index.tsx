@@ -8,8 +8,9 @@ import Box from '@mui/material/Box'
 import SearchIcon from '@mui/icons-material/Search'
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import {List, ListItem, ListItemText, ListItemIcon, Button} from '@mui/material'
-import firebase from 'firebase/app'
-import 'firebase/functions'
+import {getFunctions, httpsCallable} from 'firebase/functions'
+
+const functions = getFunctions()
 
 interface QueryAddressResult {
     add: boolean; 
@@ -52,9 +53,8 @@ function AddFriend() {
         }
 
         async function queryAddressBook(myContact: Array<QueryAddressResult>) {
-            const functions = firebase.functions()
-            const query_address_book = functions.httpsCallable('query_address_book')
-            const queryResult = await query_address_book({
+            const query_address_book = httpsCallable(functions, 'query_address_book')
+            const queryResult: any = await query_address_book({
                 users: myContact.map(({em, ph}) => {
                     return {
                         em: em ? em : '',

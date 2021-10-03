@@ -1,6 +1,5 @@
 import React from 'react'
-import * as firebase from 'firebase/app'
-import 'firebase/functions'
+import {getFunctions, httpsCallable} from 'firebase/functions'
 
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
@@ -15,11 +14,11 @@ interface Props {
     tp: string;
 }
 
-const functions = firebase.default.functions()
+const functions = getFunctions()
 
 function SentRequest(props: Props) {
     const handleUndo = async () => {
-        const undoFriendRequest = functions.httpsCallable('undo_friend_request')
+        const undoFriendRequest = httpsCallable(functions, 'undo_friend_request')
         const undoResult = await undoFriendRequest({
             friendUid: props.uid
         })

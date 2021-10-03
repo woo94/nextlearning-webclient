@@ -1,7 +1,6 @@
 import React from 'react'
 import * as firebase from 'firebase/app'
-import 'firebase/functions'
-import 'firebase/auth'
+import {getFunctions, httpsCallable} from 'firebase/functions'
 
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
@@ -17,11 +16,11 @@ interface Props {
     tp: string;
 }
 
-const functions = firebase.default.functions()
+const functions = getFunctions()
 
 function ReceivedRequest(props: Props) {
     const handleAccept = () => {
-        const acceptFriendRequest = functions.httpsCallable('accept_friend_request')
+        const acceptFriendRequest = httpsCallable(functions, 'accept_friend_request')
         console.log('handleAccept')
         acceptFriendRequest({
             friendUid: props.uid
@@ -31,7 +30,7 @@ function ReceivedRequest(props: Props) {
         
     }
     const handleDecline = () => {
-        const declineFriendRequest = functions.httpsCallable('decline_friend_request')
+        const declineFriendRequest = httpsCallable(functions, 'decline_friend_request')
         declineFriendRequest({
             friendUid: props.uid
         }).then(res => {
