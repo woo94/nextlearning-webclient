@@ -24,6 +24,6 @@ This project requires me to work more than what i expected but gives me the foll
 
 Runs the application.
 
-### `npm run server`
+#### `npm run server`
 
 Add friend feature is based on the contacts saved on the device. This command is alternatives to the device's contact.
