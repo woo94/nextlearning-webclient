@@ -1,16 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import './firebase'
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import "@fontsource/roboto"
 import {Provider} from 'react-redux'
 import AppStore from './util/appState/Store'
 import {BrowserRouter as Router} from 'react-router-dom'
+import './base.css'
+
 
 ReactDOM.render(
   <Provider store={AppStore}>
     <Router>
-    <App />
+      <App />
     </Router>
   </Provider>,
   document.getElementById('root')
