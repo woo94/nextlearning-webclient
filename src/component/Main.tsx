@@ -13,31 +13,6 @@ import { Home, Community, Profile, Challenge } from './Tab'
 import { SocketContext } from '../socket/context'
 import {User} from 'src/util/types'
 
-interface NavItemProps {
-    linkTo: string;
-    navTitle: string;
-    tabValue: string;
-    icon: string | React.ReactElement<any, string | React.JSXElementConstructor<any>>;
-    handler: () => void;
-}
-
-function NavItem(props: NavItemProps) {
-    const {linkTo, handler, navTitle, tabValue, icon} = props
-    return (
-        <Grid sx={{py: 1}} flexGrow={1} item>
-            <Link onClick={handler} style={{textDecoration: 'none'}} to={linkTo} >
-                <Box>
-                    {icon}
-                </Box>
-                <Box>
-                    {navTitle}
-                </Box>
-                {/* <Tab sx={{color: navTitle === tabValue ? 'black' : 'white', width: '100%'}} value={navTitle} label={navTitle} icon={icon} /> */}
-            </Link>
-        </Grid>
-    )
-}
-
 function Main() {
     const user = useAppSelector(selectUser)
     const friend = useAppSelector(selectFriend)
@@ -142,17 +117,6 @@ function Main() {
                     <Profile />
                 </Route>
             </Switch>
-
-            <Box display={navDisplay} >
-                <AppBar position="fixed" sx={{ top: 'auto', bottom: 0, textAlign: 'center' }} >
-                    <Grid container>
-                        <NavItem handler={() => {setNav('home')}} linkTo="/" navTitle={"home"} tabValue={nav} icon={<HomeIcon />} />
-                        <NavItem handler={() => {setNav('challenge')}} linkTo="/community" navTitle={"challenge"} tabValue={nav} icon={<Favorite />} />
-                        <NavItem handler={() => {setNav('community')}} linkTo="/community" navTitle={"community"} tabValue={nav} icon={<StarHalf />} />
-                        <NavItem handler={() => {setNav('profile')}} linkTo="/profile" navTitle={"profile"} tabValue={nav} icon={<AccountCircle />} />
-                    </Grid>
-                </AppBar>
-            </Box>
         </Container>
     )
 }

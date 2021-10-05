@@ -6,9 +6,11 @@ import FriendsRequest from './Friend/FriendList/FriendsRequest'
 import {Container} from '@material-ui/core'
 import {BrowserRouter as Router, Switch, Route, Link, useRouteMatch} from 'react-router-dom'
 import TopController from '../../Common/TopController'
-import MyStudyGroup from './MyStudyGroup'
+import StudyGroupWidget from './StudyGroupWidget'
 import StudyGroupList from './StudyGroup/StudyGroupList'
 import AddStudyGroup from './StudyGroup/AddStudyGroup'
+import GroupChatRoom from './StudyGroup/GroupChatRoom'
+import BottomNav from 'src/component/Common/BottomNav'
 
 export function Community() {
     const {url} = useRouteMatch()
@@ -18,7 +20,8 @@ export function Community() {
             <Switch>
                 <Route exact path='/community'>
                     <FriendsOnline />
-                    <MyStudyGroup />
+                    <StudyGroupWidget />
+                    <BottomNav nav="community" />
                 </Route>
                 <Route path={`${url}/add-friend`} >
                     <AddFriend />
@@ -26,11 +29,14 @@ export function Community() {
                 <Route path={`${url}/friend-list`}>
                     <FriendList />
                 </Route>
-                <Route path={`${url}/study-group`}>
+                <Route exact path={`${url}/study-group`}>
                     <StudyGroupList />
                 </Route>
                 <Route path={`${url}/add-study-group`}>
                     <AddStudyGroup />
+                </Route>
+                <Route path={`${url}/study-group/:groupId`}>
+                    <GroupChatRoom />
                 </Route>
             </Switch>
         </Container>
