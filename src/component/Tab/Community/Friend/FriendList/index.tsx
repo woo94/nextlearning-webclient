@@ -1,7 +1,7 @@
 import React, {useContext} from 'react'
 import TopController, {Props} from '../../../../Common/TopController'
 import {useAppSelector} from '../../../../../util/appState/hooks'
-import {selectUser} from '../../../../../util/appState/userSlice'
+import {selectFriend} from '../../../../../util/appState/friendSlice'
 import {Button, Badge, Box} from '@material-ui/core'
 import {Mail} from '@material-ui/icons'
 import Typography from '@mui/material/Typography'
@@ -9,7 +9,7 @@ import FriendEntity from './FriendEntity'
 import Divider from '@mui/material/Divider'
 
 function FriendsList() {
-    const user = useAppSelector(selectUser)
+    const friend = useAppSelector(selectFriend)
 
     const topControllerProps: Props = {
         text: 'Friends',
@@ -25,7 +25,7 @@ function FriendsList() {
         <>
             <TopController {...topControllerProps} />
             <Box px={10} >
-                <Badge color="secondary" showZero badgeContent={user.friend_request.received.length} >
+                <Badge color="secondary" showZero badgeContent={friend.friend_request.received.length} >
                     <Button color="primary" onClick={showRequests} endIcon={<Mail />} >requests</Button>
                 </Badge>
             </Box>
@@ -33,14 +33,14 @@ function FriendsList() {
                 <Typography variant="subtitle1">
                     Online
                 </Typography>
-                {user.friend_list.filter(friend => friend.online).map(friend => <FriendEntity {...friend} />)}
+                {friend.friend_list.filter(friend => friend.online).map(friend => <FriendEntity {...friend} />)}
             </Box>
             <Divider variant="inset" />
             <Box>
                 <Typography variant="subtitle1">
                     Offline
                 </Typography>
-                {user.friend_list.filter(friend => !friend.online).map(friend => <FriendEntity {...friend} />)}
+                {friend.friend_list.filter(friend => !friend.online).map(friend => <FriendEntity {...friend} />)}
             </Box>
         </>
     )

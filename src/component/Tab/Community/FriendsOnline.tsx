@@ -3,12 +3,12 @@ import { Typography, Avatar, Grid, Badge, Box, Button, IconButton } from '@mater
 import {Stack, Paper} from '@mui/material'
 import { Add, ArrowForwardIos } from '@mui/icons-material'
 import { useAppSelector } from '../../../util/appState/hooks'
-import { selectUser } from '../../../util/appState/userSlice'
+import { selectFriend } from '../../../util/appState/friendSlice'
 import {Link, useRouteMatch} from 'react-router-dom'
 
 
 function FriendsOnline() {
-    const user = useAppSelector(selectUser)
+    const friend = useAppSelector(selectFriend)
     const {url} = useRouteMatch()
 
     return (
@@ -29,7 +29,7 @@ function FriendsOnline() {
                 </Grid>
             </Box>
             <Stack direction="row" spacing={1} >
-                {user.friend_list.filter(friend => friend.online === true).map(({ name }) => {
+                {friend.friend_list.filter(friend => friend.online === true).map(({ name }) => {
                     return (
                         <Box textAlign="center" >
                             <Button  >
