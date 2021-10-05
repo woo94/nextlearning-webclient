@@ -21,7 +21,7 @@ interface StudyGroup {
     enter_at: number;
     last_read: string;
     title: string;
-
+    chatFetched: boolean;
     gid: string;
 }
 
@@ -50,7 +50,7 @@ export const initStudyGroup = createAsyncThunk(
     async (uid: string) => {
         const myStudyGroupColRef = collection(firestore, 'user', uid, 'my_study_group')
         const myStudyGroupCol = await getDocs(myStudyGroupColRef)
-        const myStudyGroupDocs = myStudyGroupCol.docs.map(doc => {return {gid: doc.id, ...doc.data()}}) as unknown as Array<StudyGroup>
+        const myStudyGroupDocs = myStudyGroupCol.docs.map(doc => {return {gid: doc.id, ...doc.data(), chatFetched: false}}) as unknown as Array<StudyGroup>
         return myStudyGroupDocs
     }
 )
@@ -80,6 +80,12 @@ export const studyGroupSlice = createSlice({
         },
         unshiftChat: (state, action) => {
 
+        },
+        chatFetched: (state, action) => {
+            const group = state.groups.find(group => group.gid === action.payload)
+            if(group) {
+                group.chatFetched = true
+            }
         }
     },
     extraReducers: (builder) => {
@@ -98,7 +104,7 @@ export const studyGroupSlice = createSlice({
     }
 })
 
-export const {addStudyGroup, pushChat, unshiftChat} = studyGroupSlice.actions
+export const {addStudyGroup, pushChat, unshiftChat, chatFetched} = studyGroupSlice.actions
 
 export const selectStudyGroup = (state: RootState) => state.studyGroup
 
