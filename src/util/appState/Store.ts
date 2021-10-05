@@ -2,12 +2,14 @@ import {configureStore} from '@reduxjs/toolkit'
 import userSlice from './userSlice'
 import friendSlice from './friendSlice'
 import studyGroupSlice from './studyGroupSlice'
+import fileUploadSlice from './fileUploadSlice'
 
 const store = configureStore({
     reducer: {
         user: userSlice,
         friend: friendSlice,
-        studyGroup: studyGroupSlice
+        studyGroup: studyGroupSlice,
+        fileUpload: fileUploadSlice
     }
 })
 
