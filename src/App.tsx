@@ -7,7 +7,8 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import {SocketContext} from './socket/context'
 import { io } from 'socket.io-client'
 import {SOCKET_SERVER_URL} from './socket/config'
-import {Friend, friendOnline, friendOffline} from './util/appState/userSlice'
+import {Friend} from './util/appState/userSlice'
+import {friendOnline, friendOffline} from './util/appState/friendSlice'
 import * as Sendbird from 'sendbird'
 
 function App() {
@@ -17,8 +18,6 @@ function App() {
     const dispatch = useAppDispatch()
 
     const dispatchFriendList = (friendList: Array<Friend>) => {
-        console.log(friendList)
-        console.log('hi!')
         friendList.forEach(friend => {
             if(friend.online) {
                 dispatch(friendOnline(friend.uid))
