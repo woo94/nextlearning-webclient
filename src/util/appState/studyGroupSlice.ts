@@ -14,13 +14,12 @@ export interface StudyGroupState {
     }
 
     hostOf: Array<string>;
-    initHostOf: boolean;
 }
 
 interface StudyGroup {
-    enter_at: number;
     last_read: string;
     title: string;
+    img: string;
     chatFetched: boolean;
     gid: string;
 }
@@ -41,8 +40,7 @@ const initialState: StudyGroupState = {
 
     chats: {},
 
-    hostOf: [],
-    initHostOf: false
+    hostOf: []
 }
 
 export const initStudyGroup = createAsyncThunk(
@@ -50,21 +48,40 @@ export const initStudyGroup = createAsyncThunk(
     async (uid: string) => {
         const myStudyGroupColRef = collection(firestore, 'user', uid, 'my_study_group')
         const myStudyGroupCol = await getDocs(myStudyGroupColRef)
-        const myStudyGroupDocs = myStudyGroupCol.docs.map(doc => {return {gid: doc.id, ...doc.data(), chatFetched: false}}) as unknown as Array<StudyGroup>
-        return myStudyGroupDocs
-    }
-)
+        
+        const myStudyGroupList = myStudyGroupCol.docs.map(doc => {
+            const data = doc.data()
+            return {
+                last_read: data['last_read'] as string,
+                gid: doc.id
+            }
+        })
 
-export const initHostOf = createAsyncThunk(
-    'studyGroup/initHostOf',
-    async (param: {myUid: string, gids: Array<string>}) => {
-        const studyGroupDocRefs = param.gids.map(gid => doc(firestore, 'study_group', gid))
-        const studyGroupDocsPromise = studyGroupDocRefs.map(ref => getDoc(ref).then(doc => doc.data()))
+        const hostOf: Array<string> = []
         
-        const studyGroupDocs = await Promise.all(studyGroupDocsPromise)
-        const filteredStudyGroupDocs = studyGroupDocs.filter(doc => doc?.host === param.myUid)
-        
-        return filteredStudyGroupDocs.map(doc => doc?.gid)
+        const getMyStudyGroupPromise: Array<Promise<StudyGroup>> = myStudyGroupList.map(async ({gid, last_read}) => {
+            const studyGroupDocRef = doc(firestore, 'study_group', gid)
+            const studyGroupDoc = await getDoc(studyGroupDocRef)
+            const data = studyGroupDoc.data()
+
+            if(data?.host === uid) {
+                hostOf.push(gid)
+            }
+
+            const result: StudyGroup = {
+                last_read,
+                gid,
+                chatFetched: false,
+                title: data?.title || "",
+                img: data?.img || ""
+            }
+            return result
+        })
+
+        return {
+            groups: await Promise.all(getMyStudyGroupPromise),
+            hostOf
+        }
     }
 )
 
@@ -90,16 +107,12 @@ export const studyGroupSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(initStudyGroup.fulfilled, (state, action) => {
-            state.groups = action.payload
+            state.groups = action.payload.groups
             state.groups.forEach(group => {
                 state.chats[group.gid] = []
             })
+            state.hostOf = action.payload.hostOf
             state.initGroups = true
-        })
-
-        builder.addCase(initHostOf.fulfilled, (state, action) => {
-            state.hostOf = action.payload
-            state.initHostOf = true
         })
     }
 })

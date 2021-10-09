@@ -4,7 +4,7 @@ import {useAppDispatch, useAppSelector} from '../util/appState/hooks'
 import {selectUser, requestIdToken} from '../util/appState/userSlice'
 import {setFriendRequest, setFriendList} from '../util/appState/friendSlice'
 import {selectFriend} from '../util/appState/friendSlice'
-import {selectStudyGroup, initStudyGroup, initHostOf, addStudyGroup} from 'src/util/appState/studyGroupSlice'
+import {selectStudyGroup, initStudyGroup, addStudyGroup} from 'src/util/appState/studyGroupSlice'
 import {Grid, Typography, Container, AppBar, Toolbar, Tab, Box, SvgIconTypeMap} from '@mui/material'
 import {doc, setDoc, getDoc, getFirestore} from 'firebase/firestore'
 import { Home as HomeIcon, AccountCircle, Favorite, StarHalf } from '@mui/icons-material'
@@ -85,21 +85,14 @@ function Main() {
     },[isSocketAvailable, friend.initFriendList])
 
     useEffect(() => {
-        console.log(studyGroup.initGroups)
-        console.log(studyGroup.initHostOf)
+        // console.log(studyGroup.initGroups)
         if(!studyGroup.initGroups) {
             console.log('a')
             dispatch(initStudyGroup(user.uid))
             return
         }
 
-        if(!studyGroup.initHostOf) {
-            console.log('b')
-            dispatch(initHostOf({myUid: user.uid, gids: studyGroup.groups.map(g => g.gid)}))
-            return
-        }
-
-    }, [studyGroup.initGroups, studyGroup.initHostOf])
+    }, [studyGroup.initGroups])
 
     return (
         <Container>
