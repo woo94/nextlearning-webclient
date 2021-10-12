@@ -8,10 +8,6 @@ import {useAppSelector} from 'src/util/appState/hooks'
 function StudyGroupWidget() {
     const {url, path} = useRouteMatch()
     const {groups} = useAppSelector(selectStudyGroup)
-    const myGroup = ['group1', 'group2', 'group3']
-    console.log(url, 'url of StudyGroupWidget')
-    console.log(path, 'path of StudtyGroupWidget')
-    console.log('re-hi')
 
     return (
         <>
@@ -44,6 +40,9 @@ function StudyGroupWidget() {
                                                 <Grid item>
                                                     <Typography variant="h5">
                                                         {group.title}
+                                                        {/* <div style={{width: '50px', height: '50px', backgroundColor: "orangered"}}>
+
+                        </div> */}
                                                     </Typography>
                                                 </Grid>
                                             </Grid>

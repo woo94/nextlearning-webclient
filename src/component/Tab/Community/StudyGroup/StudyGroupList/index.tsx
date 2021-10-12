@@ -1,26 +1,28 @@
 import {useState, useEffect} from 'react'
 import TopController from '../../../../Common/TopController'
-import {useHistory, useRouteMatch, Switch, Route} from 'react-router-dom'
+import {useHistory, Switch, Route} from 'react-router-dom'
 import {Grid, Typography, IconButton, Dialog, Button, DialogTitle, DialogContent, DialogActions, TextField, Box} from '@mui/material'
 import {ArrowBackIos, Add } from '@mui/icons-material'
 import {useAppSelector, useAppDispatch} from 'src/util/appState/hooks'
 import {selectUser} from 'src/util/appState/userSlice'
-import {addStudyGroup} from 'src/util/appState/studyGroupSlice'
 import {getFunctions, httpsCallable} from 'firebase/functions'
 import {User} from 'src/util/types'
 import GroupChatRoom from '../GroupChatRoom'
+import { selectStudyGroup } from 'src/util/appState/studyGroupSlice'
 
 function StudyGroupList() {
     const history = useHistory()
     const [openModal, setOpenModal] = useState(false)
     const [createGroupTitle, setCreateGroupTitle] = useState('')
     const user = useAppSelector(selectUser)
+    const groups = useAppSelector(selectStudyGroup)
     const dispatch = useAppDispatch()
-    const {path} = useRouteMatch()
 
     const handleBackBtn = () => {
         history.goBack()
     }
+
+
 
     const createStudyGroup = async () => {
         const functions = getFunctions()
@@ -34,7 +36,6 @@ function StudyGroupList() {
             myName
         })
         
-        dispatch(addStudyGroup(myStudyGroupDoc))
         setOpenModal(false)
         setCreateGroupTitle('')
     }
