@@ -4,9 +4,11 @@ export interface __DOC__USER {
     uid: string;
     name: string;
     membership: string;
-    sponsor: Array<string>;
+    sponsor_list: Array<string>;
     latest: FieldValue;
     friend_list: Array<string>;
+    study_group_list: Array<string>;
+    img: string;
     email: string;
 }
 
@@ -17,9 +19,10 @@ export interface __DOC__PUBLIC_INFO {
     img: string;
 }
 
-export interface __DOC__MY_STUDY_GROUP {
-    enter_at: number;
-    last_read: string;
+export interface __DOC__PRIVATE_MY_STUDY_GROUP {
+    [key: string]: {
+        last_read: string;
+    }
 }
 
 export interface __DOC__MONTHLY_TASK {
@@ -29,12 +32,6 @@ export interface __DOC__MONTHLY_TASK {
 export interface __DOC__PUBLIC_FRIEND_REQUEST {
     sent: Array<FriendRequest>;
     received: Array<FriendRequest>;
-}
-
-export interface __DOC__MY_STUDY_GROUP {
-    enter_at: number;
-    last_read: string;
-    name: string;
 }
 
 export interface Friend {

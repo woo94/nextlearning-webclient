@@ -1,87 +1,48 @@
 import {RootState} from './Store'
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import {getFirestore, doc, getDoc, collection, getDocs} from 'firebase/firestore'
+import {StudyGroup} from 'src/util/types'
+import {getDatabase, ref, onChildAdded} from 'firebase/database'
 
 const firestore = getFirestore()
+const database = getDatabase()
 
-export interface StudyGroupState {
-    groups: Array<StudyGroup>;
-    initGroups: boolean;
-
-    chats: {
-        // key: gid
-        [key: string]: Array<Chat>;
-    }
-
-    hostOf: Array<string>;
-}
-
-interface StudyGroup {
-    last_read: string;
+interface STUDY_GROUP {
+    // from study_group document(study_group/${gid})
+    gid: string;
     title: string;
     img: string;
-    chatFetched: boolean;
-    gid: string;
+    description: string;
+    host: string;
+
+    // from my_study_group document(user/${uid}/private/my_study_group)
+    last_read: string;
+
+    // 
+    badge: boolean;
 }
 
-interface Chat {
-    randomKey: string;
-
-    type: "text" | "image" | "video" | "file" | "url";
-    // unix timestamp milliseconds
-    tp: number;
-    sender: string;
-    message: string;
+export interface StudyGroupState {
+    groups: Array<STUDY_GROUP>;
+    initStudyGroup: boolean;
+    initLastReads: boolean;
 }
 
 const initialState: StudyGroupState = {
     groups: [],
-    initGroups: false,
-
-    chats: {},
-
-    hostOf: []
+    initStudyGroup: false,
+    initLastReads: false
 }
 
-export const initStudyGroup = createAsyncThunk(
-    'studyGroup/initStudyGroup',
-    async (uid: string) => {
-        const myStudyGroupColRef = collection(firestore, 'user', uid, 'my_study_group')
-        const myStudyGroupCol = await getDocs(myStudyGroupColRef)
-        
-        const myStudyGroupList = myStudyGroupCol.docs.map(doc => {
-            const data = doc.data()
-            return {
-                last_read: data['last_read'] as string,
-                gid: doc.id
-            }
+export const setStudyGroup = createAsyncThunk(
+    'studyGroup/setStudyGroup',
+    async (studyGroupList: Array<string>) => {
+        const studyGroupInfoPromises = studyGroupList.map(async gid => {
+            const infoDoc = await getDoc(doc(firestore, 'study_group', gid))
+            return infoDoc.data() as StudyGroup.__DOC__STUDY_GROUP
         })
 
-        const hostOf: Array<string> = []
-        
-        const getMyStudyGroupPromise: Array<Promise<StudyGroup>> = myStudyGroupList.map(async ({gid, last_read}) => {
-            const studyGroupDocRef = doc(firestore, 'study_group', gid)
-            const studyGroupDoc = await getDoc(studyGroupDocRef)
-            const data = studyGroupDoc.data()
-
-            if(data?.host === uid) {
-                hostOf.push(gid)
-            }
-
-            const result: StudyGroup = {
-                last_read,
-                gid,
-                chatFetched: false,
-                title: data?.title || "",
-                img: data?.img || ""
-            }
-            return result
-        })
-
-        return {
-            groups: await Promise.all(getMyStudyGroupPromise),
-            hostOf
-        }
+        return await Promise.all(studyGroupInfoPromises)
     }
 )
 
@@ -89,35 +50,35 @@ export const studyGroupSlice = createSlice({
     name: "studyGroup",
     initialState,
     reducers: {
-        addStudyGroup: (state, action) => {
-            state.groups.push(action.payload)
+        updateLastReads: (state, action) => {
+            state.groups.forEach(group => {
+                group.last_read = action.payload[group.gid]['last_read']
+            })
         },
-        pushChat: (state, action) => {
-            state.chats[action.payload.gid].push(action.payload.data)
-        },
-        unshiftChat: (state, action) => {
-
-        },
-        chatFetched: (state, action) => {
+        attachBadge: (state, action) => {
             const group = state.groups.find(group => group.gid === action.payload)
-            if(group) {
-                group.chatFetched = true
+            if(!group) {
+                return
             }
+            group.badge = true
+        },
+        detachBadge: (state, action) => {
+            const group = state.groups.find(group => group.gid === action.payload)
+            if(!group) {
+                return
+            }
+            group.badge = false
         }
     },
     extraReducers: (builder) => {
-        builder.addCase(initStudyGroup.fulfilled, (state, action) => {
-            state.groups = action.payload.groups
-            state.groups.forEach(group => {
-                state.chats[group.gid] = []
-            })
-            state.hostOf = action.payload.hostOf
-            state.initGroups = true
+        builder.addCase(setStudyGroup.fulfilled, (state, action) => {
+            state.groups = action.payload.map(({gid, title, img, description, host}) => ({gid, title, img, description, host, last_read: '', badge: false}))
+            state.initStudyGroup = true
         })
     }
 })
 
-export const {addStudyGroup, pushChat, unshiftChat, chatFetched} = studyGroupSlice.actions
+export const {updateLastReads, attachBadge, detachBadge} = studyGroupSlice.actions
 
 export const selectStudyGroup = (state: RootState) => state.studyGroup
 
