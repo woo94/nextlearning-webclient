@@ -3,13 +3,15 @@ import userSlice from './userSlice'
 import friendSlice from './friendSlice'
 import studyGroupSlice from './studyGroupSlice'
 import fileUploadSlice from './fileUploadSlice'
+import taskSlice from './taskSlice'
 
 const store = configureStore({
     reducer: {
         user: userSlice,
         friend: friendSlice,
         studyGroup: studyGroupSlice,
-        fileUpload: fileUploadSlice
+        fileUpload: fileUploadSlice,
+        task: taskSlice
     }
 })
 
