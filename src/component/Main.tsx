@@ -1,65 +1,75 @@
-import React, {useState, useContext} from 'react'
+import React, { useContext } from 'react'
 import { useEffect } from 'react'
-import {useAppDispatch, useAppSelector} from '../util/appState/hooks'
-import {selectUser, requestIdToken} from '../util/appState/userSlice'
-import {setFriendRequest, setFriendList} from '../util/appState/friendSlice'
-import {selectFriend} from '../util/appState/friendSlice'
-import {selectStudyGroup, initStudyGroup, addStudyGroup} from 'src/util/appState/studyGroupSlice'
-import {Grid, Typography, Container, AppBar, Toolbar, Tab, Box, SvgIconTypeMap} from '@mui/material'
-import {doc, setDoc, getDoc, getFirestore} from 'firebase/firestore'
-import { Home as HomeIcon, AccountCircle, Favorite, StarHalf } from '@mui/icons-material'
-import { Route, Switch, Link } from 'react-router-dom'
+import {useAppDispatch, useAppSelector} from 'src/util/appState/hooks'
+import {selectUser, requestIdToken, setMyinfo} from 'src/util/appState/userSlice'
+import {setFriendRequest, setFriendList} from 'src/util/appState/friendSlice'
+import {selectFriend} from 'src/util/appState/friendSlice'
+import {setTask, selectTask} from 'src/util/appState/taskSlice'
+import {selectStudyGroup, setStudyGroup, updateLastReads} from 'src/util/appState/studyGroupSlice'
+import {Container} from '@mui/material'
+import {doc, onSnapshot, getDoc, getFirestore} from 'firebase/firestore'
+import { Route, Switch } from 'react-router-dom'
 import { Home, Community, Profile, Challenge } from './Tab'
 import { SocketContext } from '../socket/context'
 import {User} from 'src/util/types'
 
+const firestore = getFirestore()
+
+// read user document and dispatch to user/friend/studyGroup slices
+// use asyncthunk to read friend's public info 
+// use asyncthunk to read study_group's info
 function Main() {
     const user = useAppSelector(selectUser)
     const friend = useAppSelector(selectFriend)
     const studyGroup = useAppSelector(selectStudyGroup)
+    const task = useAppSelector(selectTask)
     const dispatch = useAppDispatch()
-    const [nav, setNav] = useState('home')
-    const [navDisplay, setNavDisplay] = useState('block')
 
     useEffect(() => {
-        const firestore = getFirestore()
         async function run() {
-            const friend_list = await readUserDoc()
-            await readFriendRequestDoc()
-            await readFriendInfoDocs(friend_list)
+            const userDoc = await readUserDoc()
+            
+            // dispatch to userSlice to name, img, later on maybe the membership and points too
+            dispatch(setMyinfo({
+                email: userDoc['email'],
+                img: userDoc['img'],
+                name: userDoc['name']
+            }))
+
+            // dispatch friend_list array to friendSlice, it will handle async task to fill all the friend's public information
+            dispatch(setFriendList(userDoc.friend_list))
+
+            // dispatch study_group_list array to studyGroupSlice, it will handle async task to fill all the study group's information
+            dispatch(setStudyGroup(userDoc.study_group_list))
+
+            // dispatch monthly_task docs to taskSlice
+            dispatch(setTask(user.uid))
         }
 
         async function readUserDoc() {
             const userDoc = await getDoc(doc(firestore, 'user', user.uid))
             const userDocData = userDoc.data() as User.__DOC__USER
 
-            console.log(userDocData)
-            
-            return userDocData.friend_list
-        }
-
-        async function readFriendRequestDoc() {
-            const friendRequestDoc = await getDoc(doc(firestore, 'user', user.uid, 'public', 'friend_request'))
-            const friendRequestDocData = friendRequestDoc.data() as User.__DOC__PUBLIC_FRIEND_REQUEST
-
-            const incomingRequestUserInfoDocsPromise = friendRequestDocData.received.map(({uid}) => getDoc(doc(firestore, 'user', uid, 'public', 'info')))
-            const outgoingRequestUserInfoDocsPromise = friendRequestDocData.sent.map(({uid}) => getDoc(doc(firestore, 'user', uid, 'public', 'info')))
-
-            const incomingRequestUserInfoDocs = (await Promise.all(incomingRequestUserInfoDocsPromise)).filter(doc => Boolean(doc))
-            const outgoingRequestUserInfoDocs = (await Promise.all(outgoingRequestUserInfoDocsPromise)).filter(doc => Boolean(doc))
-
-            dispatch(setFriendRequest({sent: incomingRequestUserInfoDocs, received: outgoingRequestUserInfoDocs}))
-        }
-
-        async function readFriendInfoDocs(friend_list: Array<string>) {
-            const friendInfoDocsPromise = friend_list.map(uid => getDoc(doc(firestore, 'user', uid, 'public', 'info')).then(doc => doc.data()))
-            const friendInfoDocs = (await Promise.all(friendInfoDocsPromise)).filter(doc => Boolean(doc))
-            
-            dispatch(setFriendList(friendInfoDocs.map(doc => { return { ...doc, online: false } })))
+            return userDocData
         }
 
         run()
     }, [])
+
+    useEffect(() => {
+        if(!studyGroup.initStudyGroup) {
+            return
+        }
+
+        const unsubMyStudyGroup = onSnapshot(doc(firestore, 'user', user.uid, 'private', 'my_study_group'), (doc) => {
+            const data = doc.data() as User.__DOC__PRIVATE_MY_STUDY_GROUP
+            dispatch(updateLastReads(data))
+        })
+
+        return () => {
+            unsubMyStudyGroup()
+        }
+    },[studyGroup.initStudyGroup])
 
     useEffect(() => {
         if(user.idToken === "") {
@@ -84,20 +94,10 @@ function Main() {
         }
     },[isSocketAvailable, friend.initFriendList])
 
-    useEffect(() => {
-        // console.log(studyGroup.initGroups)
-        if(!studyGroup.initGroups) {
-            console.log('a')
-            dispatch(initStudyGroup(user.uid))
-            return
-        }
-
-    }, [studyGroup.initGroups])
-
     return (
         <Container>
             <Switch>
-                <Route exact path='/'>
+                <Route path='/home'>
                     <Home />
                 </Route>
                 <Route path='/challenge'>
