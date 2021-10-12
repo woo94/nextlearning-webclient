@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button'
 import {submitLoginInfo} from '../util/appState/userSlice'
 import {useAppDispatch} from '../util/appState/hooks'
-
+import {useHistory} from 'react-router-dom'
 
 const useStyles = makeStyles({
     inputDivs: {
@@ -23,6 +23,7 @@ function Login() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const dispatch = useAppDispatch()
+    const history = useHistory()
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value)
@@ -34,6 +35,7 @@ function Login() {
 
     const handleSubmit = async () => {
         await dispatch(submitLoginInfo({email, password}))
+        history.push('/home/today')
     }
 
     return (
