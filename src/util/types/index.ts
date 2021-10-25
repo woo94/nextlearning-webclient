@@ -1,2 +1,5 @@
 export * as User from './firestore_user'
 export * as StudyGroup from './firestore_study_group'
+export * as Category from './firestore_category'
+export * as MonthlyTask from './firestore_monthly_task'
+export * as Common from './commonTypes'
