@@ -13,7 +13,8 @@ function FriendsList() {
 
     const topControllerProps: Props = {
         text: 'Friends',
-        actions: [{description: '', routes: '/community/add-friend'}]
+        backRoute: "/community",
+        plusRoute: "/community/add-friend"
     }
 
     const showRequests = () => {

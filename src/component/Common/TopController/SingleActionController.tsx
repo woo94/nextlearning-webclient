@@ -12,7 +12,7 @@ function SingleActionController(props: Props) {
     const history = useHistory()
 
     const handleBackBtn = () => {
-        history.goBack()
+        history.push(props.backRoute)
     }
 
    
@@ -28,15 +28,15 @@ function SingleActionController(props: Props) {
             </Grid>
             <Grid item xs={4}></Grid>
             {
-                props.actions.length === 1
+                props.plusRoute === ""
                     ?
+                    null
+                    :
                     <Grid item>
-                        <Link to={props.actions[0].routes}>
+                        <Link to={props.plusRoute}>
                             <AddIcon />
                         </Link>
                     </Grid>
-                    :
-                    null
             }
 
         </Grid>

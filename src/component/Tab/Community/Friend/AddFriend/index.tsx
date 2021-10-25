@@ -27,7 +27,8 @@ function AddFriend() {
 
     const viewChangerProps: Props = {
         text: "Add friend",
-        actions: [],
+        backRoute: "friend-list",
+        plusRoute: ""
     }
 
     useEffect(() => {

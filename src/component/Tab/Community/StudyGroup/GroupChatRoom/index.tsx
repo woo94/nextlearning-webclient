@@ -136,7 +136,7 @@ function GroupChatRoom() {
 
     return (
         <>
-            <TopController text={group?.title || ""} actions={[]} />
+            <TopController text={group?.title || ""} backRoute="/community" plusRoute="" />
             <Grid ref={chatViewRef} wrap="nowrap" sx={{ overflowY: "scroll", height: '80vh'}} direction="column" container>
                 <Grid flexGrow={1} flexShrink={1} item>
                     <Grid direction="column" container>

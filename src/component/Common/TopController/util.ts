@@ -1,4 +1,5 @@
 export interface Props {
     text: string;
-    actions: Array<{description: string, routes: string}>;
+    backRoute: string;
+    plusRoute: string;
 }

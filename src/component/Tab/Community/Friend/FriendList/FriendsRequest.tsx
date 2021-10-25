@@ -20,7 +20,8 @@ function FriendsRequest() {
     const friend = useAppSelector(selectFriend)
     const viewChangerProps: Props = {
         text: 'Friend requests',
-        actions: []
+        backRoute: "/community/friend-list",
+        plusRoute: ""
     }
 
     return (
