@@ -1,0 +1,1 @@
+export type Category = "school" | "extracurricular" | "challenges"
