@@ -10,6 +10,7 @@ export interface __DOC__USER {
     study_group_list: Array<string>;
     img: string;
     email: string;
+    grade: string;
 }
 
 export interface __DOC__PUBLIC_INFO {
