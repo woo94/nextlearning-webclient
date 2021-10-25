@@ -4,14 +4,15 @@ import {useAppDispatch, useAppSelector} from 'src/util/appState/hooks'
 import {selectUser, requestIdToken, setMyinfo} from 'src/util/appState/userSlice'
 import {setFriendRequest, setFriendList} from 'src/util/appState/friendSlice'
 import {selectFriend} from 'src/util/appState/friendSlice'
-import {setTask, selectTask} from 'src/util/appState/taskSlice'
+import {setTask, selectTask, updateTask, setDesignatedTask} from 'src/util/appState/taskSlice'
 import {selectStudyGroup, setStudyGroup, updateLastReads} from 'src/util/appState/studyGroupSlice'
 import {Container} from '@mui/material'
 import {doc, onSnapshot, getDoc, getFirestore} from 'firebase/firestore'
 import { Route, Switch } from 'react-router-dom'
 import { Home, Community, Profile, Challenge } from './Tab'
 import { SocketContext } from '../socket/context'
-import {User} from 'src/util/types'
+import {Category, User} from 'src/util/types'
+import MonthlyPlan from 'src/component/Tab/Home/MonthlyPlan'
 
 const firestore = getFirestore()
 
@@ -33,7 +34,8 @@ function Main() {
             dispatch(setMyinfo({
                 email: userDoc['email'],
                 img: userDoc['img'],
-                name: userDoc['name']
+                name: userDoc['name'],
+                grade: userDoc['grade']
             }))
 
             // dispatch friend_list array to friendSlice, it will handle async task to fill all the friend's public information
@@ -43,7 +45,32 @@ function Main() {
             dispatch(setStudyGroup(userDoc.study_group_list))
 
             // dispatch monthly_task docs to taskSlice
-            dispatch(setTask(user.uid))
+            
+            // this_month
+            onSnapshot(doc(firestore, 'user', user.uid, 'monthly_task', `${task.dates.today.year}-${task.dates.today.monthIntStr}`), (doc) => {
+                dispatch(updateTask({
+                    month: "this_month",
+                    docId: doc.id,
+                    data: doc.data()
+                }))
+            })
+
+            // next_month
+            onSnapshot(doc(firestore, 'user', user.uid, 'monthly_task', `${task.dates.next_month.year}-${task.dates.next_month.monthIntStr}`), (doc) => {
+                dispatch(updateTask({
+                    month: 'next_month',
+                    docId: doc.id,
+                    data: doc.data()
+                }))
+            })
+
+            // last_month
+            const lastMonthPlan = await getDoc(doc(firestore, 'user', user.uid, 'monthly_task', `${task.dates.last_month.year}-${task.dates.last_month.monthIntStr}`))
+            dispatch(updateTask({
+                month: 'last_month',
+                docId: lastMonthPlan.id,
+                data: lastMonthPlan.data()
+            }))
         }
 
         async function readUserDoc() {
@@ -55,6 +82,17 @@ function Main() {
 
         run()
     }, [])
+
+    useEffect(() => {
+        if(user.grade === "") {
+            return
+        }
+        
+        getDoc(doc(firestore, 'category', user.grade)).then(doc => {
+            const data = doc.data() as Category.__DOC__CATEGORY
+            dispatch(setDesignatedTask(data))
+        })
+    },[user.grade])
 
     useEffect(() => {
         if(!studyGroup.initStudyGroup) {
@@ -108,6 +146,9 @@ function Main() {
                 </Route>
                 <Route path='/profile'>
                     <Profile />
+                </Route>
+                <Route path="/monthly-plan">
+                    <MonthlyPlan />
                 </Route>
             </Switch>
         </Container>
