@@ -1,57 +1,67 @@
 import React, {useState} from 'react'
 import {Dialog, DialogContent, TextField, InputAdornment, Grid, Typography, FormControl, InputLabel, Select, MenuItem, Box} from '@mui/material'
 import {StarBorder, Timer}from '@mui/icons-material'
-import {useRouteMatch} from 'react-router-dom'
+import {useRouteMatch, useLocation} from 'react-router-dom'
 import {grey} from '@mui/material/colors'
 import {useAppSelector} from 'src/util/appState/hooks'
 import {selectUser} from 'src/util/appState/userSlice'
-import {doc, getFirestore, updateDoc, arrayUnion, FieldValue} from 'firebase/firestore'
+import {doc, getFirestore, updateDoc, arrayUnion, increment} from 'firebase/firestore'
 import {createSingleTask} from 'src/util/snippets'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
-dayjs.tz.setDefault(dayjs.tz.guess())
+import {selectTask} from 'src/util/appState/taskSlice'
+import {Common, MonthlyTask} from 'src/util/types'
 
 interface Props {
-    setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-    openDialog: boolean;
+    setOpenAddTaskDialog: React.Dispatch<React.SetStateAction<boolean>>;
+    openAddTaskDialog: boolean;
 }
 
 const firestore = getFirestore()
 
 export default function AddTaskDialog(props: Props) {
-    const [timeOptionalSelect, setTimeOptionalSelect] = useState('')
-    const [taskTitle, setTaskTitle] = useState('')
+    const [taskTimeOption, setTaskTimeOption] = useState<MonthlyTask.TimeOption>('')
+    const [taskName, setTaskName] = useState('')
     const [taskTimeSelect, setTaskTimeSelect] = useState(30)
-    const [taskCategory, setTaskCategory] = useState('school')
+    const [taskCategory, setTaskCategory] = useState<Common.Category>('school')
     const {url} = useRouteMatch()
     const user = useAppSelector(selectUser)
+    const task = useAppSelector(selectTask)
+    const location = useLocation()
 
     const saveTask = () => {
-        const dayInfo = url.split('/')[2]
-        console.log(dayInfo)
+        const day = location.pathname.includes('today') ? "today" : "tomorrow"
+        const dayInfo = task.dates[day]
+        const docId = `${dayInfo.year}-${dayInfo.monthIntStr}`
+        const counter = task.monthly_task_docs[docId].counter
 
-        let dayjsObj = dayjs()
-        
-        if(dayInfo === "tomorrow") {
-            dayjsObj = dayjsObj.add(1, 'day')
+        const taskDocRef = doc(firestore, 'user', user.uid, 'monthly_task', docId)
+        const updateDocObject: MonthlyTask.__DOC__MONTHLY_TASK = {
+            counter: counter + 1
+        }
+        const daily_management: MonthlyTask.DailyManagement = {}
+        daily_management[dayInfo.date] = {
+            id: `${docId}-${dayInfo.date}-task${counter}`,
+            result_list: [],
+            step: "define",
+            time_option: taskTimeOption,
+            fulfilled: 0,
+            name: taskName,
+            mode: "",
+            min: taskTimeSelect
+        }
+        updateDocObject[`task${counter}`] = {
+            category: taskCategory,
+            name: taskName,
+            counter,
+            time_option: taskTimeOption,
+            day_list: [dayInfo.day],
+            week_list: [dayInfo.week],
+            daily_management,
+            min: taskTimeSelect
         }
 
-        const year = dayjsObj.year()
-        const month = dayjsObj.month() + 1
-        const day = dayjsObj.date().toString()
-
-        const taskDocRef = doc(firestore, 'user', user.uid, 'monthly_task', `${year}-${month}`)
-        const updateDocObject: {[key: string]: FieldValue} = {}
-        updateDocObject[day] = arrayUnion(createSingleTask(taskCategory, parseInt(dayjsObj.format('YYYYMMDD')), taskTimeSelect, taskTitle, timeOptionalSelect))
-
-        props.setOpenDialog(false)
-        setTaskTitle('')
-        setTimeOptionalSelect('')
+        props.setOpenAddTaskDialog(false)
+        setTaskName('')
+        setTaskTimeOption('')
         setTaskTimeSelect(30)
         setTaskCategory('school')
 
@@ -59,7 +69,7 @@ export default function AddTaskDialog(props: Props) {
     }
 
     return (
-        <Dialog fullWidth maxWidth="sm" onClose={() => { props.setOpenDialog(false) }} open={props.openDialog}>
+        <Dialog fullWidth maxWidth="sm" onClose={() => { props.setOpenAddTaskDialog(false) }} open={props.openAddTaskDialog}>
             {/* <DialogTitle>this is a dialog</DialogTitle> */}
             <DialogContent>
                 <div style={{margin: '0 auto', textAlign: 'center'}}>
@@ -72,8 +82,8 @@ export default function AddTaskDialog(props: Props) {
                             </InputAdornment>
                         )
                     }}
-                    value={taskTitle}
-                    onChange={(e) => {setTaskTitle(e.target.value)}}
+                    value={taskName}
+                    onChange={(e) => {setTaskName(e.target.value)}}
                     placeholder={"title"}
                 />
                 </div>
@@ -90,8 +100,8 @@ export default function AddTaskDialog(props: Props) {
                                 labelId="time-optional-select"
                                 id="time-optional-select"
                                 label="select"
-                                value={timeOptionalSelect}
-                                onChange={(e) => { setTimeOptionalSelect(e.target.value) }}
+                                value={taskTimeOption}
+                                onChange={(e) => { setTaskTimeOption(e.target.value as MonthlyTask.TimeOption) }}
                                 defaultValue=""
                             >
                                 <MenuItem value="">
@@ -172,7 +182,7 @@ export default function AddTaskDialog(props: Props) {
                         <FormControl fullWidth>
                             <Select
                                 value={taskCategory}
-                                onChange={(e) => {setTaskCategory(e.target.value)}}
+                                onChange={(e) => {setTaskCategory(e.target.value as Common.Category)}}
                             >
                                 <MenuItem value="school">
                                     School

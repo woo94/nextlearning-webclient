@@ -13,6 +13,7 @@ export interface Friend extends PublicInfo {
 export interface UserState extends PublicInfo {
     idToken: string;
     isLogin: boolean;
+    grade: string;
 }
 
 const initialState: UserState = {
@@ -22,6 +23,7 @@ const initialState: UserState = {
     uid: '',
     isLogin: false,
     name: '',
+    grade: ''
 }
 
 export const submitLoginInfo = createAsyncThunk(
@@ -67,6 +69,7 @@ export const userSlice = createSlice({
             state.email = action.payload.email
             state.img = action.payload.img
             state.name = action.payload.name
+            state.grade = action.payload.grade
         }
     },
 

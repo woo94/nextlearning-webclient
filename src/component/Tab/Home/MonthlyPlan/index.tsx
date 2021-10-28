@@ -5,6 +5,7 @@ import {selectTask} from 'src/util/appState/taskSlice'
 import {MonthlyTask} from 'src/util/types'
 import {useAppSelector} from 'src/util/appState/hooks'
 import MonthlyPlannerContext, {PlannerContext} from 'src/util/context/MonthlyPlannerContext'
+import { FieldValue, deleteField } from '@firebase/firestore'
 
 export default function MonthlyPlan() {
     const {path} = useRouteMatch()
@@ -26,7 +27,7 @@ export default function MonthlyPlan() {
         set_next_month_updateDoc({})
     }, [task.next_month])
 
-    const editPlanner = (month: number, taskName: string, editContent: MonthlyTask.SingleTask) => {
+    const editPlan = (month: number, taskName: string, editContent: MonthlyTask.SingleTask) => {
         if(month === 0) {
             const _this_month_context = {...this_month_context}
             const _this_month_updateDoc = {...this_month_updateDoc}
@@ -55,8 +56,27 @@ export default function MonthlyPlan() {
         }
     }
 
+    const deletePlan = (month: number, taskName: string) => {
+        if(month === 0) {
+            const _this_month_context = {...this_month_context}
+            const _this_month_updateDoc = {...this_month_updateDoc}
+            delete _this_month_context[taskName]
+            _this_month_updateDoc[taskName] = deleteField()
+            set_this_month_context(_this_month_context)
+            set_this_month_updateDoc(_this_month_updateDoc)
+        }
+        else {
+            const _next_month_context = {...next_month_context}
+            const _next_month_updateDoc = {...next_month_updateDoc}
+            delete _next_month_context[taskName]
+            _next_month_updateDoc[taskName] = deleteField()
+            set_next_month_context(_next_month_context)
+            set_next_month_updateDoc(_next_month_updateDoc)
+        }
+    }
+
     return (
-        <MonthlyPlannerContext.Provider value={{this_month: this_month_context, next_month: next_month_context, editPlanner, this_month_updateDoc: this_month_updateDoc, next_month_updateDoc: next_month_updateDoc}}>
+        <MonthlyPlannerContext.Provider value={{this_month: this_month_context, next_month: next_month_context, editPlan, deletePlan, this_month_updateDoc, next_month_updateDoc}}>
             <Switch>
                 <Route path={`${path}/:month`}>
                     <MonthlyPlanner />

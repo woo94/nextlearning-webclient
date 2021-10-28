@@ -17,13 +17,28 @@ const initialState: FileUploadState = {
 
 export const uploadStudyGroupFileMessage = createAsyncThunk(
     'fileUpload/uploadStudyGroupFileMessage',
-    async (data: { sender: string; fileName: string, fileBlob: Blob, filePath: ReturnType<typeof storageRef>; }) => {
+    async (data: { sender: string; fileName: string, fileBlob: Blob, filePath: ReturnType<typeof storageRef> }) => {
         const metadata = {
             customMetadata: {
                 sender: data.sender,
                 filename: data.fileName
             },
             cacheControl: 'private, max-age=15552000'
+        }
+
+        return uploadBytes(data.filePath, data.fileBlob, metadata)
+    }
+)
+
+export const uploadRecordVideo = createAsyncThunk(
+    'fileUpload/uploadRecordVideo',
+    async (data: { uploader: string, taskId: string, fileBlob: Blob, filePath: ReturnType<typeof storageRef> }) => {
+        const metadata = {
+            customMetadata: {
+                uploader: data.uploader,
+                taskId: data.taskId,
+                fileCategory: 'record-result'
+            },
         }
 
         return uploadBytes(data.filePath, data.fileBlob, metadata)

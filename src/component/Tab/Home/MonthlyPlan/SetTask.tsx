@@ -7,7 +7,8 @@ import {MonthlyTask, Common} from 'src/util/types'
 import {useHistory, useRouteMatch} from 'react-router-dom'
 import {useAppSelector} from 'src/util/appState/hooks'
 import MonthlyPlannerContext, {PlannerContext} from 'src/util/context/MonthlyPlannerContext'
-import {isAbleDayExists, appliedDays, getPossibleDays} from 'src/util/snippets'
+import { appliedDays, getPossibleDays} from 'src/util/snippets'
+import { deleteField } from '@firebase/firestore'
 
 const DayItem = (props: {day: string, select: boolean, index: number, handler: (start: number) => void }) => {
     return (
@@ -75,8 +76,8 @@ export default function SetTask() {
         
         const {day_list} = historyState as HistoryStateOnEditing
 
-        day_list.forEach((day: MonthlyTask.Day) => {
-            arr[MonthlyTask.dayEnum[day]] = true
+        day_list.forEach((day) => {
+            arr[day] = true
         })
 
         return arr
@@ -117,7 +118,7 @@ export default function SetTask() {
         if(historyState.mode === "create") {
             return 30
         }
-        return ((historyState as HistoryStateOnEditing).min || (historyState as HistoryStateOnEditing).time) as number
+        return ((historyState as HistoryStateOnEditing).min) as number
     })())
 
     const [taskCategory, setTaskCategory] = useState<Common.Category>((() => {
@@ -150,19 +151,16 @@ export default function SetTask() {
         }
 
         const day_list = (() => {
-            const arr: Array<MonthlyTask.Day> = []
-            if(daySelect[0]) arr.push('sun')
-            if(daySelect[1]) arr.push('mon')
-            if(daySelect[2]) arr.push('tue')
-            if(daySelect[3]) arr.push('wed')
-            if(daySelect[4]) arr.push('thu')
-            if(daySelect[5]) arr.push('fri')
-            if(daySelect[6]) arr.push('sat')
-
+            const arr: Array<number> = []
+            daySelect.forEach((value, index) => {
+                if(value === true) {
+                    arr.push(index)
+                }
+            })
             return arr
         })()
 
-        if(monthSelect === 0 && getPossibleDays(start, day_list, yearMonth, parseInt(task.dates.today.day)).length === 0) {
+        if(monthSelect === 0 && getPossibleDays(start, day_list, yearMonth, parseInt(task.dates.today.date)).length === 0) {
             alert('no match day')
             return
         }
@@ -187,22 +185,29 @@ export default function SetTask() {
 
     // handleSave uses MonthlyPlannerContext's editPlanner method
     const handleSave = () => {
-        const week_list = weekSelect.map((val, index) => val ? index : -1).filter(val => val > 0)
-        const day_list = ((): Array<MonthlyTask.Day> => {
-            const arr: Array<MonthlyTask.Day> = []
-            if(daySelect[0]) arr.push('sun')
-            if(daySelect[1]) arr.push('mon')
-            if(daySelect[2]) arr.push('tue')
-            if(daySelect[3]) arr.push('wed')
-            if(daySelect[4]) arr.push('thu')
-            if(daySelect[5]) arr.push('fri')
-            if(daySelect[6]) arr.push('sat')
+        const day_list = (() => {
+            const arr: Array<number> = []
+            daySelect.forEach((value, index) => {
+                if(value === true) {
+                    arr.push(index)
+                }
+            })
 
             return arr
         })()
+        if(day_list.length === 0) {
+            alert('select applying days')
+            return
+        }
+
+        const week_list = weekSelect.map((val, index) => val ? index : -1).filter(val => val > 0)
+        if(week_list.length === 0) {
+            alert('select applying weeks')
+            return
+        }
 
         const daily_management: MonthlyTask.DailyManagement = {}
-        const day = task.dates.today.day
+        const day = task.dates.today.date
 
         const isEditingThisMonth = ((mode: "create" | "edit", monthSelect: number) => mode === "edit" && monthSelect === 0).call(null, historyState.mode, monthSelect)
 
@@ -226,14 +231,16 @@ export default function SetTask() {
                 result_list: [],
                 step: "define",
                 min: taskTimeSelect,
-                time_option: taskTimeOption
+                time_option: taskTimeOption,
+                name: taskName,
+                mode: ""
             }
         })
 
         const updateDoc: MonthlyTask.SingleTask = {
             time_option: taskTimeOption,
             category: taskCategory,
-            time: taskTimeSelect,
+            min: taskTimeSelect,
             week_list,
             day_list,
             daily_management,
@@ -241,7 +248,7 @@ export default function SetTask() {
             counter: taskCounter
         }
 
-        monthlyPlannerContextValue?.editPlanner(monthSelect, `task${taskCounter}`, updateDoc)
+        monthlyPlannerContextValue?.editPlan(monthSelect, `task${taskCounter}`, updateDoc)
         if(match.url.split('/').includes('this_month')){
             history.push('/monthly-plan/this_month')
         }
@@ -259,6 +266,16 @@ export default function SetTask() {
         }
 
         history.push(`/monthly-plan/${month}/create-task`)
+    }
+
+    const handleDelete = () => {
+        monthlyPlannerContextValue?.deletePlan(monthSelect, `task${taskCounter}`)
+        if(match.url.split('/').includes('this_month')){
+            history.push('/monthly-plan/this_month')
+        }
+        else {
+            history.push('/monthly-plan/next_month')
+        }
     }
 
     return (
@@ -378,11 +395,22 @@ export default function SetTask() {
                 </Grid>
             </Grid>
 
-            <Box onClick={handleSave} sx={{ bgcolor: grey[300], cursor: 'pointer', textAlign: 'center', py: 2, borderRadius: '30px', my: 2}}>
-                <Typography variant="h6">
-                    Save
-                </Typography>
-            </Box>
+            <Grid spacing={2} container>
+                <Grid flexGrow={1} item>
+                    <Box onClick={handleSave} sx={{ bgcolor: grey[300], cursor: 'pointer', textAlign: 'center', py: 2, borderRadius: '30px', my: 2 }}>
+                        <Typography variant="h6">
+                            Save
+                        </Typography>
+                    </Box>
+                </Grid>
+                <Grid flexGrow={1} item>
+                    <Box onClick={handleDelete} sx={{ bgcolor: grey[300], cursor: 'pointer', textAlign: 'center', py: 2, borderRadius: '30px', my: 2 }}>
+                        <Typography variant="h6">
+                            Delete
+                        </Typography>
+                    </Box>
+                </Grid>
+            </Grid>
         </Container>
     )
 }

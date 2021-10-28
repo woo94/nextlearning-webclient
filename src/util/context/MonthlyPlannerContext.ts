@@ -1,3 +1,4 @@
+import { FieldValue } from '@firebase/firestore'
 import {createContext} from 'react'
 import {MonthlyTask} from 'src/util/types'
 
@@ -7,7 +8,8 @@ export interface PlannerContext {
     // month: 
     // 0 when this_month
     // 1 when next_month
-    editPlanner: (month: number, taskName: string, editContent: MonthlyTask.SingleTask) => void;
+    editPlan: (month: number, taskName: string, editContent: MonthlyTask.SingleTask) => void;
+    deletePlan: (month: number, taskName: string) => void;
     this_month_updateDoc: Partial<MonthlyTask.__DOC__MONTHLY_TASK>;
     next_month_updateDoc: Partial<MonthlyTask.__DOC__MONTHLY_TASK>;
 }

@@ -8,25 +8,32 @@ export default function Summary() {
     const user = useAppSelector(selectUser)
 
     return (
-        <Grid sx={{py: 2}} alignItems="center" maxWidth="sm" container>
-            <Grid sx={{mr: 1}} item>
-                <Avatar>
-                    <AccountCircle fontSize="large" />
-                </Avatar>
+        <Grid sx={{py: 2}} justifyContent="space-between" alignItems="center" maxWidth="sm" container>
+            <Grid item>
+                <Grid alignItems="center" container>
+                    <Grid sx={{ mr: 1 }} item>
+                        <Avatar>
+                            <AccountCircle fontSize="large" />
+                        </Avatar>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="h5">
+                            Hello {user.name}
+                        </Typography>
+                    </Grid>
+                </Grid>
             </Grid>
             <Grid item>
-                <Typography variant="h5">
-                    Hello {user.name}
-                </Typography>
-            </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid sx={{mr: 1}} item>
-                <Avatar>
-                    <Lightbulb />
-                </Avatar>
-            </Grid>
-            <Grid item>
-                <Chip label={"Points: 300"} />
+                <Grid alignItems="center" container>
+                    <Grid sx={{ mr: 1 }} item>
+                        <Avatar>
+                            <Lightbulb />
+                        </Avatar>
+                    </Grid>
+                    <Grid item>
+                        <Chip label={"Points: 300"} />
+                    </Grid>
+                </Grid>
             </Grid>
         </Grid>
     )

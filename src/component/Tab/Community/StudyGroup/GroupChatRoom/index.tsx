@@ -197,7 +197,8 @@ function GroupChatRoom() {
                 </Grid>
             </Grid>
             <input accept="image/*" multiple={false} onInput={handleOnInput}
-                style={{ display: 'none' }} ref={inputRef} type="file" />
+                style={{ display: 'none' }} 
+                ref={inputRef} type="file" />
         </>
     )
 }
