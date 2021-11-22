@@ -128,7 +128,7 @@ export default function RecordMode() {
         const fileBlob = new Blob(recordedChunks, {
             type: "video/webm"
         })
-        const cloudStorageRef = storageRef(storage, `${user.uid}/recordings/${fileName}`)
+        const cloudStorageRef = storageRef(storage, `${user.uid}/recording/${fileName}`)
         dispatch(uploadRecordVideo({
             uploader: user.uid,
             taskId: id,

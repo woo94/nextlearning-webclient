@@ -19,6 +19,7 @@
     "@types/node": "^12.20.19",
     "@types/react": "^17.0.15",
     "@types/react-dom": "^17.0.9",
+    "agora-rtc-sdk-ng": "^4.7.2",
     "cors": "^2.8.5",
     "dayjs": "^1.10.6",
     "express": "^4.17.1",

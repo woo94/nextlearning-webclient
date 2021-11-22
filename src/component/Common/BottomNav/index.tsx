@@ -51,7 +51,7 @@ export default function BottomNav(props: Props) {
         <AppBar position="fixed" sx={{top: 'auto', bottom: 0, textAlign: 'center'}} >
             <Grid container>
                 <NavItem linkTo="/home/today" handler={() => setNav('home')} navTitle="home" nav={nav} icon={<HomeIcon />} />
-                <NavItem linkTo="/challenge" handler={() => setNav('challenge')} navTitle="challenge" nav={nav} icon={<Favorite />} />
+                <NavItem linkTo="/library" handler={() => setNav('library')} navTitle="library" nav={nav} icon={<Favorite />} />
                 <NavItem linkTo="/community" navTitle="community" handler={() => setNav('community')}  nav={nav} icon={<StarHalf />} />
                 <NavItem linkTo="/profile" navTitle="profile" handler={() => setNav('profile')} nav={nav} icon={<AccountCircle />} />
             </Grid>

@@ -9,7 +9,7 @@ import {selectStudyGroup, setStudyGroup, updateLastReads} from 'src/util/appStat
 import {Container} from '@mui/material'
 import {doc, onSnapshot, getDoc, getFirestore} from 'firebase/firestore'
 import { Route, Switch } from 'react-router-dom'
-import { Home, Community, Profile, Challenge } from './Tab'
+import { Home, Community, Profile, Library } from './Tab'
 import { SocketContext } from '../socket/context'
 import {Category, User} from 'src/util/types'
 import MonthlyPlan from 'src/component/Tab/Home/MonthlyPlan'
@@ -138,8 +138,8 @@ function Main() {
                 <Route path='/home'>
                     <Home />
                 </Route>
-                <Route path='/challenge'>
-                    <Challenge />
+                <Route path='/library'>
+                    <Library />
                 </Route>
                 <Route path='/community'>
                     <Community />
