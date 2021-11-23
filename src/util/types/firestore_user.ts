@@ -1,11 +1,11 @@
-import { FieldValue } from "@firebase/firestore";
+import { Timestamp, FieldValue } from "@firebase/firestore";
 
 export interface __DOC__USER {
     uid: string;
     name: string;
     membership: string;
     sponsor_list: Array<string>;
-    latest: FieldValue;
+    latest: Timestamp | FieldValue;
     friend_list: Array<string>;
     study_group_list: Array<string>;
     img: string;

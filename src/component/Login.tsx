@@ -1,12 +1,15 @@
 import React, {useState} from 'react'
-import Container from '@material-ui/core/Container'
-import TextField from '@material-ui/core/TextField'
+import {Container, TextField, Typography, Button, Snackbar} from '@mui/material'
 import {makeStyles} from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import {submitLoginInfo} from '../util/appState/userSlice'
 import {useAppDispatch} from '../util/appState/hooks'
 import {useHistory} from 'react-router-dom'
+import {getAuth, setPersistence, signInWithEmailAndPassword, browserSessionPersistence} from 'firebase/auth'
+import {getFirestore, doc, getDoc} from 'firebase/firestore' 
+import {setMyinfo} from 'src/util/appState/userSlice'
+import {__DOC__USER} from 'src/util/types/firestore_user'
+
+const auth = getAuth()
+const firestore = getFirestore()
 
 const useStyles = makeStyles({
     inputDivs: {
@@ -24,6 +27,7 @@ function Login() {
     const [password, setPassword] = useState('')
     const dispatch = useAppDispatch()
     const history = useHistory()
+    const [openSnackbar, setOpenSnackbar] = useState(false)
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value)
@@ -34,8 +38,15 @@ function Login() {
     }
 
     const handleSubmit = async () => {
-        await dispatch(submitLoginInfo({email, password}))
-        history.push('/home/today')
+        await setPersistence(auth, browserSessionPersistence)
+        try {
+            await signInWithEmailAndPassword(auth, email, password)
+        }
+        catch(e) {
+            console.log(e)
+            setOpenSnackbar(true)
+        }
+        
     }
 
     return (
@@ -55,6 +66,7 @@ function Login() {
                 <div className={classes.inputDivs}>
                     <Button onClick={handleSubmit} variant="outlined" color="primary" size="large">Login</Button>
                 </div>
+                <Snackbar open={openSnackbar} message="Login fail! - check out the email and password" onClose={() => {setOpenSnackbar(false)}} autoHideDuration={3000} />
             </Container>
     )
 }

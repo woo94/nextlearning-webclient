@@ -13,8 +13,10 @@ import { Home, Community, Profile, Library } from './Tab'
 import { SocketContext } from '../socket/context'
 import {Category, User} from 'src/util/types'
 import MonthlyPlan from 'src/component/Tab/Home/MonthlyPlan'
+import {getAuth} from 'firebase/auth'
 
 const firestore = getFirestore()
+const auth = getAuth()
 
 // read user document and dispatch to user/friend/studyGroup slices
 // use asyncthunk to read friend's public info 
