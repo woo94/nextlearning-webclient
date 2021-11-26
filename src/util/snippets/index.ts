@@ -1,6 +1,8 @@
 import { MonthlyTask } from 'src/util/types'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
+import {__DOC__PLANNER} from 'src/util/types/firestore_planner'
+import { __DOC__DAILY_TASK } from '../types/firestore_daily_task'
 
 dayjs.extend(weekOfYear)
 
@@ -85,4 +87,41 @@ export const taskIdToAccessor = (id: string) => {
         fieldName,
         date
     }
+}
+
+export const createCalendar = (planners: Array<__DOC__PLANNER>, ...year_month: Array<string>) => {
+    interface Calendar {
+        [key: number]: Array<__DOC__PLANNER & __DOC__DAILY_TASK>;
+    }
+
+    interface Calendars {
+        // year_month
+        [key: string]: Calendar;
+    }
+
+    const c: Calendars = { }
+    year_month.forEach(ym => {
+        const dateObj = dayjs(ym)
+        c[ym] = { }
+        const daysInMonth = dateObj.daysInMonth()
+        for(let i=1; i<=daysInMonth; i++) {
+            c[ym][i] = []
+        }
+    })
+
+    planners.forEach(planner => {
+        planner.define_date_list.forEach(date => {
+            c[planner.year_month][date].push({
+                ...planner, 
+                date,
+                min: 0,
+                fulfilled: 0,
+                mode: 'timer',
+                step: 'define',
+                result_list: []
+            })
+        })
+    })
+
+    return c
 }
