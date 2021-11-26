@@ -5,6 +5,8 @@ import studyGroupSlice from './studyGroupSlice'
 import fileUploadSlice from './fileUploadSlice'
 import taskSlice from './taskSlice'
 import librarySlice from './librarySlice'
+import plannerSlice from './plannerSlice'
+import dailyTaskSlice from './dailyTaskSlice'
 
 const store = configureStore({
     reducer: {
@@ -13,7 +15,9 @@ const store = configureStore({
         studyGroup: studyGroupSlice,
         fileUpload: fileUploadSlice,
         task: taskSlice,
-        library: librarySlice
+        library: librarySlice,
+        planner: plannerSlice,
+        dailyTask: dailyTaskSlice
     }
 })
 
