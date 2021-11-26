@@ -1,4 +1,12 @@
+// ===METADATA
 // COLLECTION_ID: "planner"
+// DOCUMENT_ID: auto-id
+// ex)lJbXfbkXcHCnqZsXdJ4w
+// 문서 생성시점: Plan tab에서 save를 한 경우
+
+// ===OPERATION===
+// write: Plan tab only
+// read: Home tab, Plan tab
 
 // Plan tab only
 // Plan tab에서 document write를 수행한다.
@@ -12,37 +20,26 @@
 // 코드를 작성하는 입장에서는 요소가 존재하지 않을 수 있음을 감안하여 작성한다.
 // 제대로 수행되었거나 되고있는지 알아보는 행위는 reward에 반영하거나 진행정도 퍼센트를 알아내기 위해 수행된다(date_list 배열의 길이를 분모로, step이 done인 daily_management 필드의 개수를 분자로 한다)
 
-export interface __DOC__PLANNER {
-    counter: number;
-    [key: string]: number | Plan;
-}
 
-interface Plan {
-    // 2021-11-plan1
-    plan_id: string;
+export interface __DOC__PLANNER {
+    planner_id: string;
+    year_month: string;
     category: string;
 
     // this field might change its name
-    sub_category: string;
-
-    counter: number;
+    task_group: string;
+    task_subject: string;
     
-    min: number;
     name: string;
     time_option: string;
+    
     // 0:sun ~ 6:sat
     day_list: Array<number>;
+    
     // 0:week1 ~ N:end of week
     week_list: Array<number>;
-    // 1~31
-    date_list: Array<number>;
-    progress: number;
-}
 
-/**
- * {
- *  counter: 3,
- *  2021-11-plan1: { plan_id: 2021-11-plan1, ... },
- *  2021-11-plan2: { plan_id: 2021-11-plan2, ... }
- * }
- */
+    // 1~31
+    define_date_list: Array<number>;
+    done_date_list: Array<number>;
+}
