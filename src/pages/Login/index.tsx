@@ -1,15 +1,9 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Container, TextField, Typography, Button, Snackbar} from '@mui/material'
 import {makeStyles} from '@material-ui/core'
-import {useAppDispatch} from '../util/appState/hooks'
-import {useHistory} from 'react-router-dom'
 import {getAuth, setPersistence, signInWithEmailAndPassword, browserSessionPersistence} from 'firebase/auth'
-import {getFirestore, doc, getDoc} from 'firebase/firestore' 
-import {setMyinfo} from 'src/util/appState/userSlice'
-import {__DOC__USER} from 'src/util/types/firestore_user'
 
 const auth = getAuth()
-const firestore = getFirestore()
 
 const useStyles = makeStyles({
     inputDivs: {
@@ -25,8 +19,6 @@ function Login() {
     const classes = useStyles()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const dispatch = useAppDispatch()
-    const history = useHistory()
     const [openSnackbar, setOpenSnackbar] = useState(false)
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
