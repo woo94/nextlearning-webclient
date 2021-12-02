@@ -89,7 +89,7 @@ export const taskIdToAccessor = (id: string) => {
     }
 }
 
-export const createCalendar = (planners: Array<__DOC__PLANNER>, ...year_month: Array<string>) => {
+export const createCalendar = (planners: Array<__DOC__PLANNER>, dailyTasks: Array<__DOC__DAILY_TASK>, ...year_month: Array<string>) => {
     interface Calendar {
         [key: number]: Array<__DOC__PLANNER & __DOC__DAILY_TASK>;
     }
@@ -116,11 +116,22 @@ export const createCalendar = (planners: Array<__DOC__PLANNER>, ...year_month: A
                 date,
                 min: 0,
                 fulfilled: 0,
-                mode: 'timer',
+                mode: '',
                 step: 'define',
                 result_list: []
             })
         })
+    })
+
+    dailyTasks.forEach(dailyTask => {
+        const {year_month, date, planner_id} = dailyTask
+        const taskIndex = c[year_month][date].findIndex(val => val.planner_id === planner_id)
+
+        if(taskIndex !== -1) {
+            const taskData = c[year_month][date][taskIndex]
+            c[dailyTask.year_month][dailyTask.date][taskIndex] = {...taskData, ...dailyTask}
+        }
+        
     })
 
     return c
