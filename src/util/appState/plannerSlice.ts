@@ -13,12 +13,11 @@ export const plannerSlice = createSlice({
     name: 'planner',
     initialState: plannerAdapter.getInitialState(),
     reducers: {
-        addOnePlanner: plannerAdapter.addOne,
-        updateOnePlanner: plannerAdapter.updateOne,
+        upsertOnePlanner: plannerAdapter.upsertOne
     }
 })
 
-export const {addOnePlanner, updateOnePlanner} = plannerSlice.actions
+export const {upsertOnePlanner} = plannerSlice.actions
 
 export const selectPlanner = (state: RootState) => state.planner
 
