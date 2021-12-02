@@ -20,6 +20,8 @@
 // Map의 key값을 추출한 다음 startsWith($YYYY-M-D)를 이용한 filter를 통해 yesterday/today/tomorrow 데이터를 뽑아낸다.
 // 
 
+export type Mode = "" | "timer" | "recording"
+
 export interface __DOC__DAILY_TASK {
     planner_id: string;
     year_month: string;
@@ -28,7 +30,7 @@ export interface __DOC__DAILY_TASK {
     date: number;
     min: number;
     fulfilled: number;
-    mode: "timer" | "record";
+    mode: Mode;
     step: string;
     time_option: string;
     result_list: Array<string>;
